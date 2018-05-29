@@ -9,6 +9,7 @@
 
 
 #include "headers/client.h"
+#include "headers/oiragatob.h"
 
 // compile with gcc -Wall -g -o sock ./bot.c -lwebsockets
 // call with: ogar-client -o agar.io 127.0.0.1:1443
@@ -113,6 +114,10 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
                 // Parser rbuff
                 // Algorythme
                 // utiliser sendCommand()
+
+								unsigned char **buf;
+								unsigned int *len;
+								oiaragatob(rbuf,buf,len);
 
 
 
