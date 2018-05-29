@@ -10,7 +10,7 @@
 
 #include "headers/client.h"
 
-// compile with gcc -Wall -g -o sock ./test-client.c -lwebsockets
+// compile with gcc -Wall -g -o sock ./bot.c -lwebsockets
 // call with: ogar-client -o agar.io 127.0.0.1:1443
 
 
@@ -107,6 +107,15 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 			// we have receive some data, check with websocket API if this is a final fragment
 			if (lws_is_final_fragment(wsi)) {
 				// call recv function here !!!!
+
+
+
+                // Parser rbuff
+                // Algorythme
+                // utiliser sendCommand()
+
+
+
 				offset=0;
 			}
 		} else {	// length is too long... get others but ignore them...

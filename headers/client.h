@@ -1,7 +1,7 @@
 #include "libwebsockets.h"
-#define MAXLEN 600
+#define MAXLEN 15000
 
-static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len); 
+static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
 
 int forceExit;
 
@@ -11,8 +11,8 @@ typedef struct s_packet {
         struct s_packet *next;
 } t_packet;
 
-/// Pointer on the list of packet to be send when socket is writeable 
-t_packet *packetList=NULL; 
+/// Pointer on the list of packet to be send when socket is writeable
+t_packet *packetList=NULL;
 
 /// LibWebsocket interlan structure needed for API
 struct lws_protocols protocols[] = {
@@ -21,13 +21,13 @@ struct lws_protocols protocols[] = {
 	callbackOgar,
     	0,
     	20
-    	}, 
+    	},
 	{
 	NULL,
 	NULL,
 	0,
 	0
 	}
-}; 
+};
 
 static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
