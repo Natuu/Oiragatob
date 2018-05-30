@@ -1,7 +1,18 @@
 typedef struct buffer{
-  
+
   unsigned char *buf;
   unsigned int len;
+
 } Buffer;
 
-struct buffer oiragatob (unsigned char *rbuf);
+typedef struct cellule{
+
+  int id;
+  float x;
+  float y;
+  float size;
+  int flag;
+
+} Cellule;
+
+Buffer oiragatob (unsigned char *rbuf);
