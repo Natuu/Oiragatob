@@ -1,6 +1,6 @@
-typedef srtuct {
+typedef struct buffer{
   unsigned char *buf;
   unsigned int len;
-} buffer;
+} Buffer;
 
 struct buffer oiragatob (unsigned char *rbuf);
