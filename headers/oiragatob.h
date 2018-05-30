@@ -1,4 +1,4 @@
-typedef srtuct {
+typedef struct {
   unsigned char *buf;
   unsigned int len;
 } buffer;
