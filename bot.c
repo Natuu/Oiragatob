@@ -11,8 +11,8 @@
 #include "headers/client.h"
 #include "headers/oiragatob.h"
 
-// compile with gcc -Wall -g -o sock ./bot.c -lwebsockets
-// call with: ogar-client -o agar.io 127.0.0.1:1443
+// compile with gcc -Wall -g -o bot ./bot.c -lwebsockets
+// call with: ./bot -o agar.io 127.0.0.1:1443
 
 
 
@@ -93,6 +93,16 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		fprintf(stderr, "ogar: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
+
+
+
+		// Ouvrir la connexion
+		unsigned char connexion[] = {0xff, 0x00, 0x00, 0x00, 0x00};
+		sendCommand(wsi, connexion, 5);
+		// Choisir un nom
+		unsigned char nom[] = {0x00, 'O', 'i', 'r', 'a', 'g', 'a', 't', 'o', 'b', 0x00};
+		sendCommand(wsi, nom, 11);
+
 		break;
 
  	case LWS_CALLBACK_CLIENT_WRITEABLE:
@@ -110,16 +120,10 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 				// call recv function here !!!!
 
 
-
                 // Parser rbuff
                 // Algorythme
                 // utiliser sendCommand()
-
-								unsigned char **buf;
-								unsigned int *len;
-								oiaragatob(rbuf);
-
-
+								printf("%5s\n", rbuf);
 
 				offset=0;
 			}
