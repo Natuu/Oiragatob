@@ -25,3 +25,5 @@ typedef struct map{
 } Map;
 
 Buffer oiragatob (unsigned char *rbuf, Map *mapVisible);
+
+int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet);

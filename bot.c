@@ -7,7 +7,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "headers/gestionPaquets.h"
 #include "headers/client.h"
 #include "headers/oiragatob.h"
 
@@ -129,6 +128,10 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 
 				Buffer command = oiragatob(rbuf, &mapVisible);
 				// sendCommand(wsi, command.buf, command.len);
+
+				// Choisir un nom
+				unsigned char pos[] = {0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ,0x00 ,0x00,0x00, 0x00};
+				sendCommand(wsi, pos, 13);
 
 				offset=0;
 			}
