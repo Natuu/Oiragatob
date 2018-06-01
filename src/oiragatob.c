@@ -10,11 +10,13 @@
 #include "../headers/oiragatob.h"
 
 //Penser au free pour le malloc
-Buffer oiragatob (unsigned char *recu){
+Buffer oiragatob (unsigned char *recu, Map *mapVisible){
 
   // Variable à modifier en fonction des actions
   int lenRecu;
   int len;
+  int cellMort;
+  int lenPackCell;
 
   printf("%d\n", recu[0]);
 
@@ -27,37 +29,47 @@ Buffer oiragatob (unsigned char *recu){
     case 64: // Bords
       lenRecu = 33;
       printf("Bords recus\n");
+
+      mapVisible->left = valeurPaquet(1, 8, recu);
+      mapVisible->right = valeurPaquet(9, 8, recu);
+      mapVisible->top = valeurPaquet(17, 8, recu);
+      mapVisible->bottom = valeurPaquet(25, 8, recu);
+
     break;
 
     case 16: // MAJ cellules
       printf("MAJ recus\n");
 
-      // Jusqu'aux cellules non mortes
-      lenRecu = 1 + 2 + 256 * recu[4] * 8 + recu[3] * 8;
+      cellMort = valeurPaquet(1, 2, recu);  // ou l'inverse ?
 
-      // Nombre de cellules vivantes
-      int lenCellules = 0;
+      Cellule cellVivante;
 
-      // On parcourre les cellules vivantes
-      while (recu[lenRecu] != 0) {
-         // On ajoute une cellule vivante
-        lenCellules ++;
+      // Tri du buffer
+      int parcourCell = 3 + cellMort * 8;
 
-        // Octets avant le nom (protocole < 5)
-        lenRecu += 18;
-
-        // Octets dans le nom
-        while (recu[lenRecu - 1] != 0) {
-          lenRecu ++;
+      while (recu[parcourCell] + recu[parcourCell + 1] + recu[parcourCell + 2] + recu[parcourCell + 3] != 0){
+        cellVivante.id = valeurPaquet(parcourCell, 4, recu);
+        cellVivante.x = valeurPaquet((parcourCell + 4), 4, recu);
+        cellVivante.y = valeurPaquet((parcourCell + 8), 4, recu);
+        cellVivante.size = valeurPaquet((parcourCell + 12), 2, recu);
+        cellVivante.flag = valeurPaquet((parcourCell + 14), 1, recu);
+        parcourCell += 18;
+        while(recu[parcourCell] != 0){
+          parcourCell ++;
         }
+        parcourCell ++;
 
-        lenRecu ++;
       }
 
-      //Liste des cellules
-      Cellule cellules[lenCellules];
+
+
+
 
     break;
+
+    default:
+      printf("Paquet inconnu %d", rbuf[0]);
+
   }
 
   Buffer envoi;

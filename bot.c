@@ -7,14 +7,14 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-
+#include "headers/gestionPaquets.h"
 #include "headers/client.h"
 #include "headers/oiragatob.h"
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets
 // call with: ./bot -o agar.io 127.0.0.1:1443
 
-
+Map mapVisible;
 
 // =====================================================================================================================================
 //	Start of function definition
@@ -127,7 +127,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
                 // Algorythme
                 // utiliser sendCommand()
 
-				// Buffer command = oiragatob(rbuf);
+				Buffer command = oiragatob(rbuf, &mapVisible);
 				// sendCommand(wsi, command.buf, command.len);
 
 				offset=0;

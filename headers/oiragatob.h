@@ -16,4 +16,12 @@ typedef struct cellule{
 
 } Cellule;
 
-Buffer oiragatob (unsigned char *rbuf);
+typedef struct map{
+  int left;
+  int right;
+  int top;
+  int bottom;
+
+} Map;
+
+Buffer oiragatob (unsigned char *rbuf, Map *mapVisible);
