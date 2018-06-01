@@ -12,6 +12,8 @@ typedef struct cellule{
   float y;
   float size;
   int flag;
+  int zoneX;
+  int zoneY;
   struct cellule *prochaine;
 
 } Cellule;

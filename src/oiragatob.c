@@ -63,25 +63,32 @@ Buffer oiragatob (unsigned char *recu, Map *mapVisible){
 
       cellMort = valeurPaquet(1, 2, recu);  // ou l'inverse ?
 
-      Cellule cellVivante;
+      Cellule *listeCellVivantes;
+      Cellule *cellVivante;
 
+      cellVivante = malloc(1 * sizeof(Cellule));
+      listeCellVivantes = cellVivante;
       // Tri du buffer
       int parcourCell = 3 + cellMort * 8;
 
       while (recu[parcourCell] + recu[parcourCell + 1] + recu[parcourCell + 2] + recu[parcourCell + 3] != 0){
-        cellVivante.id = valeurPaquet(parcourCell, 4, recu);
-        cellVivante.x = valeurPaquet((parcourCell + 4), 4, recu);
-        cellVivante.y = valeurPaquet((parcourCell + 8), 4, recu);
-        cellVivante.size = valeurPaquet((parcourCell + 12), 2, recu);
-        cellVivante.flag = valeurPaquet((parcourCell + 14), 1, recu);
+
+        cellVivante -> id = valeurPaquet(parcourCell, 4, recu);
+        cellVivante -> x = valeurPaquet((parcourCell + 4), 4, recu);
+        cellVivante -> y = valeurPaquet((parcourCell + 8), 4, recu);
+        cellVivante -> size = valeurPaquet((parcourCell + 12), 2, recu);
+        cellVivante -> flag = valeurPaquet((parcourCell + 14), 1, recu);
         parcourCell += 18;
         while(recu[parcourCell] != 0){
           parcourCell ++;
         }
+
         parcourCell ++;
 
-      }
+        cellVivante -> prochaine = malloc(1 * sizeof(Cellule));
+        cellVivante = cellVivante -> prochaine
 
+      }
 
 
 
@@ -93,7 +100,7 @@ Buffer oiragatob (unsigned char *recu, Map *mapVisible){
 
   }
 
-  
+
 
   Buffer envoi;
 
