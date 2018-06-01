@@ -95,8 +95,12 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		fprintf(stderr, "ogar: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 
 		// Ouvrir la connexion
-		unsigned char connexion[] = {0xfe, 0x00, 0x00, 0x00, 0x00};
+		unsigned char connexion[] = {0xff, 0x00, 0x00, 0x00, 0x00};
 		sendCommand(wsi, connexion, 5);
+
+		// Ouvrir la connexion
+		unsigned char connexion2[] = {0xfe, 0x0d, 0x00, 0x00, 0x00};
+		sendCommand(wsi, connexion2, 5);
 
 		// Choisir un nom
 		unsigned char nom[] = {0x00, 'O', 'i', 'r', 'a', 'g', 'a', 't', 'o', 'b', 0x00};
@@ -122,8 +126,9 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
                 // Parser rbuff
                 // Algorythme
                 // utiliser sendCommand()
-				Buffer command = oiragatob(rbuf);
-				sendCommand(wsi, command.buf, command.len);
+
+				// Buffer command = oiragatob(rbuf);
+				// sendCommand(wsi, command.buf, command.len);
 
 				offset=0;
 			}
