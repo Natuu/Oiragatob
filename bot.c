@@ -95,7 +95,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		fprintf(stderr, "ogar: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 
 		// Ouvrir la connexion
-		unsigned char connexion[] = {0xff, 0x00, 0x00, 0x00, 0x00};
+		unsigned char connexion[] = {0xfe, 0x00, 0x00, 0x00, 0x00};
 		sendCommand(wsi, connexion, 5);
 
 		// Choisir un nom
