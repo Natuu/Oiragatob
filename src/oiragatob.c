@@ -27,7 +27,22 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
     }
 
     return valeur;
-  }
+}
+
+unsigned char *paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
+
+    paquet = malloc(sizeof(unsigned char) * nombreOctets);
+    int i;
+
+    paquet[0] = valeur % 256;
+
+    for (i = 1; i < nombreOctets; i++) {
+        paquet[i] = valeur / 256;
+        valeur %= 256;
+    }
+
+    return *paquet;
+}
 
 
 //Penser au free pour le malloc
