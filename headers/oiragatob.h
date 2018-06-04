@@ -47,4 +47,4 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
 
 double binToDouble(int64_t x);
 
-void pointerVersPosition (int *sourisX, int *sourisY, int **densite, int nombreZonesX, int nombreZonesY, int posX, int posY, int tailleZoneX, int tailleZoneY, int bordGauche, int bordHaut);
+void pointerVersPosition (int *sourisX, int *sourisY, int nombreZonesX, int nombreZonesY, int densite[nombreZonesX][nombreZonesY], int posX, int posY, int tailleZoneX, int tailleZoneY, int bordGauche, int bordHaut);

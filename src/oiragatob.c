@@ -11,7 +11,7 @@
 #include "../headers/oiragatob.h"
 
 #define DISTANCECOEFF 1
-#define DENSITECOEFF  1
+#define DENSITECOEFF  1000
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -84,35 +84,42 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
     }
 }
 
-void pointerVersPosition (int *sourisX, int *sourisY, int **densite, int nombreZonesX, int nombreZonesY, int posX, int posY, int tailleZoneX, int tailleZoneY, int bordGauche, int bordHaut) {
+void pointerVersPosition (int *sourisX, int *sourisY, int nombreZonesX, int nombreZonesY, int densite[nombreZonesX][nombreZonesY], int posX, int posY, int tailleZoneX, int tailleZoneY, int bordGauche, int bordHaut) {
 
     int i;
     int j;
     int distanceX = 0;
     int distanceY = 0;
     int distance = 0;
-    int ratio = 0;
-    int bestRatio = 0;
+    float ratio = 0;
+    float bestRatio = 0;
 
     *sourisX = 0;
     *sourisY = 0;
 
+
     for (i = 0; i < nombreZonesX; i++) {
         for (j = 0; j < nombreZonesY; j++) {
 
-            distanceX = (bordGauche + tailleZoneX * i + 0.5 * tailleZoneX) - posX;
-            distanceY = (bordHaut + tailleZoneY * i + 0.5 * tailleZoneY) - posY;
+            distanceX = (tailleZoneX * i + 0.5 * tailleZoneX) - (posX - bordGauche);
+            distanceY = (tailleZoneY * j + 0.5 * tailleZoneY) - (posY - bordHaut);
             distance = sqrt(distanceX * distanceX + distanceY * distanceY);
 
-            ratio = (DENSITECOEFF * densite[i][j]) / (DISTANCECOEFF * distance);
+            ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * (float)distance);
+            // printf("%f ", ratio);
+
 
             if (ratio > bestRatio) {
-                *sourisX = bordGauche + tailleZoneX * i + 0.5 * tailleZoneX;
-                *sourisY = bordHaut + tailleZoneY * i + 0.5 * tailleZoneY;
+                bestRatio = ratio;
+                *sourisX = tailleZoneX * i + 0.5 * tailleZoneX;
+                *sourisY = tailleZoneY * j + 0.5 * tailleZoneY;
             }
 
         }
+        // printf("\n");
     }
+
+    printf("Pointer vers : %d, %d\n", *sourisX, *sourisY);
 
 }
 
@@ -120,10 +127,8 @@ void pointerVersPosition (int *sourisX, int *sourisY, int **densite, int nombreZ
 Buffer oiragatob (unsigned char *recu, Infos *infos){
 
   // Variable à modifier en fonction des actions
-  int lenRecu;
   int len = 0;
   int cellMort;
-  int lenPackCell;
   Buffer envoi;
 
   // Position
@@ -162,8 +167,6 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
   // Bords
   else if (recu[0] == 64) {
-      lenRecu = 33;
-
       // Espace visible
       infos->visibleG = (int)valeurPaquetF(1, 8, recu);
       infos->visibleH = (int)valeurPaquetF(9, 8, recu);
@@ -180,6 +183,7 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
   // MAJ cellules
   else if (recu[0] == 16) {
+
       int i;
       int j;
 
@@ -187,8 +191,20 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       int nombreZonesY = (infos->visibleB - infos->visibleH) / (infos->taille * 0.7);
       int densite[nombreZonesX][nombreZonesY];
 
+      for (i = 0; i < nombreZonesX; i++) {
+        for (j = 0; j < nombreZonesY; j++) {
+          densite[i][j] = 0;
+        }
+      }
+
+      int zoneX = 0;
+      int zoneY = 0;
+
       int *sourisX;
       int *sourisY;
+
+      sourisX = malloc(sizeof(int));
+      sourisY = malloc(sizeof(int));
 
       Cellule *cellVivante;
 
@@ -202,7 +218,7 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
           }
       }
 
-      cellVivante = malloc(1 * sizeof(Cellule));
+      cellVivante = malloc(sizeof(Cellule));
       // Tri du buffer
       int parcourCell = 3 + cellMort * 8;
 
@@ -214,11 +230,13 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
         cellVivante -> taille = valeurPaquet((parcourCell + 12), 2, recu);
         cellVivante -> flag = valeurPaquet((parcourCell + 14), 1, recu);
         parcourCell += 18;
-        while(recu[parcourCell] != 0){
-          parcourCell ++;
+        if (cellVivante -> flag & 8) {
+            while(recu[parcourCell] != 0){
+              parcourCell ++;
+            }
+            parcourCell ++;
         }
 
-        parcourCell ++;
 
         // On selectionne la plus grosse de nos cellules
         for (j = 0; j < 16; j++) {
@@ -226,9 +244,9 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
             if(cellVivante -> id == infos->idCellules[j]) {
                 if (infos -> taille < cellVivante -> taille) {
                     infos -> taille = cellVivante -> taille;
-                    infos -> posX = cellVivante -> x;
-                    infos -> posY = cellVivante -> y;
                 }
+                infos -> posX = cellVivante -> x;
+                infos -> posY = cellVivante -> y;
             }
         }
 
@@ -250,16 +268,20 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
         }
       }
 
-      pointerVersPosition (sourisX, sourisY, densite, nombreZonesX, nombreZonesY, infos -> posX, infos -> posY, (infos->taille * 0.7), (infos->taille * 0.7), infos -> visibleG, infos -> visibleH);
+      pointerVersPosition (sourisX, sourisY, nombreZonesX, nombreZonesY, densite, infos -> posX, infos -> posY, (infos->taille * 0.7), (infos->taille * 0.7), infos -> visibleG, infos -> visibleH);
 
 
       // Envoi du paquet
       len = 13;
 
-      unsigned char idPaquet[1];
-      unsigned char xPaquet[4];
-      unsigned char yPaquet[4];
-      unsigned char uselessPaquet[4];
+      unsigned char *idPaquet;
+      idPaquet = malloc(sizeof(unsigned char) * 1);
+      unsigned char *xPaquet;
+      xPaquet = malloc(sizeof(unsigned char) * 4);
+      unsigned char *yPaquet;
+      yPaquet = malloc(sizeof(unsigned char) * 4);
+      unsigned char *uselessPaquet;
+      uselessPaquet = malloc(sizeof(unsigned char) * 4);
       paquetValeur(1, 16, idPaquet);
       paquetValeur(4, *sourisX, xPaquet);
       paquetValeur(4, *sourisY, yPaquet);
@@ -268,15 +290,14 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       //Initialisation du pointeur
       envoi.buf = malloc(len * sizeof(unsigned char));
 
-      unsigned char paquetIntermediaire1[5];
+      unsigned char *paquetIntermediaire1;
+      paquetIntermediaire1 = malloc(sizeof(unsigned char) * 5);
       assemblerPaquets(idPaquet, 1, xPaquet, 4, paquetIntermediaire1);
-      unsigned char paquetIntermediaire2[9];
+      unsigned char *paquetIntermediaire2;
+      paquetIntermediaire2 = malloc(sizeof(unsigned char) * 9);
       assemblerPaquets(paquetIntermediaire1, 5, yPaquet, 4, paquetIntermediaire2);
       // Derniers paquets
       assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi.buf);
-
-
-      printf("Pointer vers : %d, %d\n", *sourisX, *sourisY);
   }
 
   else if (recu[0] == 49) {
