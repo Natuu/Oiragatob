@@ -18,13 +18,16 @@ typedef struct cellule{
 
 } Cellule;
 
-typedef struct map{
-  int left;
-  int right;
-  int top;
-  int bottom;
+typedef struct infos{
+  int carteG;
+  int carteD;
+  int carteH;
+  int carteB;
+  int posX;
+  int posY;
+  int taille;
 
-} Map;
+} Infos;
 
 Buffer oiragatob (unsigned char *rbuf, Map *mapVisible);
 
