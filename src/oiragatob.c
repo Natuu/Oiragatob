@@ -29,6 +29,15 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
     return valeur;
 }
 
+float binToFloat(int x) {
+    union {
+        int  x;
+        float  f;
+    } temp;
+    temp.x = x;
+    return temp.f;
+}
+
 void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
     int i;
 
@@ -59,43 +68,72 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
   // Variable à modifier en fonction des actions
   int lenRecu;
-  int len;
+  int len = 0;
   int cellMort;
   int lenPackCell;
+  Buffer envoi;
 
-  printf("%d\n", recu[0]);
-
-  switch (recu[0]) {
-    case 17: // Position
-      lenRecu = 13;
-      printf("Pos recus\n");
+  // Position
+  if (recu[0] == 17) {
 
       infos->posX = valeurPaquet(1, 4, recu);
       infos->posY = valeurPaquet(5, 4, recu);
       infos->taille = valeurPaquet(9, 4, recu);
 
-    break;
+      printf("PosX    : %d\nPosY    : %d\nTaille  : %d\n", infos->posX, infos->posY, infos->taille);
+  }
 
-    case 64: // Bords
+  // Vider cellules
+  else if (recu[0] == 18) {
+
+      int i;
+
+      for (i = 0; i < 16; i++) {
+        infos->idCellules[i] = 0;
+      }
+
+      printf("Plus de cellules controlées\n");
+  }
+
+  // Ajout cellule
+  else if (recu[0] == 32) {
+
+    int i;
+
+    while (infos->idCellules[i] != 0) i++;
+
+    infos->idCellules[i] = valeurPaquet(1, 4, recu);
+
+    printf("Ajout cellule d'ID : %d\n", infos->idCellules[i]);
+  }
+
+  // Bords
+  else if (recu[0] == 64) {
       lenRecu = 33;
-      printf("Bords recus\n");
 
       // Espace visible
-      infos->visibleG = valeurPaquet(1, 8, recu);
-      infos->visibleD = valeurPaquet(9, 8, recu);
-      infos->visibleH = valeurPaquet(17, 8, recu);
-      infos->visibleB = valeurPaquet(25, 8, recu);
+      infos->visibleG = (int)binToFloat(valeurPaquet(1, 8, recu));
+      infos->visibleD = (int)binToFloat(valeurPaquet(9, 8, recu));
+      infos->visibleH = (int)binToFloat(valeurPaquet(17, 8, recu));
+      infos->visibleB = (int)binToFloat(valeurPaquet(25, 8, recu));
 
       // Carte
       if(infos->carteD < infos->visibleD) infos->carteD = infos->visibleD;
       if(infos->carteB < infos->visibleB) infos->carteB = infos->visibleB;
 
-    break;
+      printf("Bord gauche  : %d\nBord droit   : %d\nBord haut    : %d\nBord bas     : %d\n", infos->visibleG, infos->visibleD, infos->visibleH, infos->visibleB);
+  }
 
-    case 16: // MAJ cellules
-      printf("MAJ recus\n");
 
-      cellMort = valeurPaquet(1, 2, recu);  // ou l'inverse ?
+  // MAJ cellules
+  else if (recu[0] == 16) {
+
+      cellMort = valeurPaquet(1, 2, recu);
+
+      int nombreCasesX = (infos->visibleD - infos->visibleG) / (infos->taille * 0.7);
+      int nombreCasesY = (infos->visibleB - infos->visibleH) / (infos->taille * 0.7);
+
+      int cases[nombreCasesX][nombreCasesY];
 
       Cellule *listeCellVivantes;
       Cellule *cellVivante;
@@ -125,20 +163,14 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       }
 
 
-
-
-    break;
-
-    default:
-      printf("Paquet inconnu %d", recu[0]);
-
+      printf("Pointer vers : ??, ??\n");
   }
 
 
+  else printf("Paquet inconnu d'OPCODE %d\n", recu[0]);
 
-  Buffer envoi;
 
-  len = 0;
+
 
   // envoi.len = uclen(recu);                          //Traitement de l'attribut taille
   envoi.buf = malloc(len * sizeof(unsigned char));  //Initialisation du pointeur

@@ -8,9 +8,9 @@ typedef struct buffer{
 typedef struct cellule{
 
   int id;
-  float x;
-  float y;
-  float size;
+  int x;
+  int y;
+  int size;
   int flag;
   int zoneX;
   int zoneY;
@@ -23,6 +23,7 @@ typedef struct infos{
   int carteD;
   int carteH;
   int carteB;
+  int idCellules[16];
   int posX;
   int posY;
   int taille;

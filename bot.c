@@ -14,6 +14,7 @@
 // call with: ./bot -o agar.io 127.0.0.1:1443
 
 Infos infos;
+int i;
 
 // =====================================================================================================================================
 //	Start of function definition
@@ -108,6 +109,10 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		infos.sourisX = 0;
 		infos.sourisY = 0;
 
+		for (i = 0; i < 16; i++) {
+			infos.idCellules[i] = 0;
+		}
+
 		// Ouvrir la connexion
 		unsigned char connexion[] = {0xff, 0x00, 0x00, 0x00, 0x00};
 		sendCommand(wsi, connexion, 5);
@@ -119,6 +124,17 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		// Choisir un nom
 		unsigned char nom[] = {0x00, 'O', 'i', 'r', 'a', 'g', 'a', 't', 'o', 'b', 0x00};
 		sendCommand(wsi, nom, 11);
+
+		// Choisir une direction
+		unsigned char pos[] = {0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+		unsigned char *inutile;
+		inutile = malloc(sizeof(unsigned char) * 4);
+		unsigned char *renvoi;
+		paquetValeur(4, 0, inutile);
+		renvoi = malloc(sizeof(unsigned char) * (9 + 4));
+		assemblerPaquets(pos, 9, inutile, 4, renvoi);
+
+		sendCommand(wsi, renvoi, 13);
 
 		break;
 
@@ -143,17 +159,6 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 
 				Buffer command = oiragatob(rbuf, &infos);
 				// sendCommand(wsi, command.buf, command.len);
-
-				// Choisir un nom
-				unsigned char pos[] = {0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-				unsigned char *inutile;
-				inutile = malloc(sizeof(unsigned char) * 4);
-				unsigned char *renvoi;
-				paquetValeur(4, 0, inutile);
-				renvoi = malloc(sizeof(unsigned char) * (9 + 4));
-				assemblerPaquets(pos, 9, inutile, 4, renvoi);
-
-				sendCommand(wsi, renvoi, 13);
 
 				offset=0;
 			}
