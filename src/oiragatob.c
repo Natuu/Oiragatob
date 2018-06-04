@@ -29,19 +29,33 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
     return valeur;
 }
 
-unsigned char *paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
-
+void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
     paquet = malloc(sizeof(unsigned char) * nombreOctets);
     int i;
 
     paquet[0] = valeur % 256;
 
     for (i = 1; i < nombreOctets; i++) {
-        paquet[i] = valeur / 256;
-        valeur %= 256;
+        paquet[i] = valeur % 256;
+        valeur /= 256;
+    }
+}
+
+
+void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char *paquet2, int longueurPaquet2, unsigned char *paquet) {
+    paquet = malloc(sizeof(unsigned char) * (longueurPaquet1 + longueurPaquet2);
+    int i;
+
+    for (i = 0; i < longueurPaquet1; i++) {
+        paquet[i] = paquet1[i];
     }
 
-    return *paquet;
+    for (i = longueurPaquet1; i < longueurPaquet1 + longueurPaquet2; i++) {
+        paquet[i] = paquet2[i];
+    }
+
+    free(paquet1);
+    free(paquet2);
 }
 
 
@@ -64,7 +78,7 @@ Buffer oiragatob (unsigned char *rbuf, Infos *infos){
       infos->posX = valeurPaquet(1, 4, recu);
       infos->posY = valeurPaquet(5, 4, recu);
       infos->taille = valeurPaquet(9, 4, recu);
-      
+
     break;
 
     case 64: // Bords
