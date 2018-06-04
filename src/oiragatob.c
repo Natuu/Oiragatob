@@ -20,7 +20,7 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
     for (i = indiceDepart; i < longueurPaquet + indiceDepart; i++) {
         paquetActuel = paquet[i];
         for (j = 0; j < compteurBoucles; j++) {
-            paquetActuel *= 256;
+            paquetActuel *= 0x100;
         }
         compteurBoucles ++;
         valeur += paquetActuel;
@@ -29,13 +29,32 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
     return valeur;
 }
 
-float binToFloat(int x) {
+double binToDouble(int64_t x) {
     union {
-        int  x;
-        float  f;
+        int64_t  x;
+        double  f;
     } temp;
     temp.x = x;
     return temp.f;
+}
+
+double valeurPaquetF (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
+    int64_t valeur=0;
+    int64_t paquetActuel;
+    int i;
+    int j;
+    int compteurBoucles = 0;
+
+    for (i = indiceDepart; i < longueurPaquet + indiceDepart; i++) {
+        paquetActuel = paquet[i];
+        for (j = 0; j < compteurBoucles; j++) {
+            paquetActuel *= 0x100;
+        }
+        compteurBoucles ++;
+        valeur += paquetActuel;
+    }
+
+    return binToDouble(valeur);
 }
 
 void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
@@ -92,7 +111,7 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
         infos->idCellules[i] = 0;
       }
 
-      printf("Plus de cellules controlées\n");
+      // printf("Plus de cellules controlées\n");
   }
 
   // Ajout cellule
@@ -104,7 +123,7 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
     infos->idCellules[i] = valeurPaquet(1, 4, recu);
 
-    printf("Ajout cellule d'ID : %d\n", infos->idCellules[i]);
+    // printf("Ajout cellule d'ID : %d\n", infos->idCellules[i]);
   }
 
   // Bords
@@ -112,16 +131,16 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       lenRecu = 33;
 
       // Espace visible
-      infos->visibleG = (int)binToFloat(valeurPaquet(1, 8, recu));
-      infos->visibleD = (int)binToFloat(valeurPaquet(9, 8, recu));
-      infos->visibleH = (int)binToFloat(valeurPaquet(17, 8, recu));
-      infos->visibleB = (int)binToFloat(valeurPaquet(25, 8, recu));
+      infos->visibleG = (int)valeurPaquetF(1, 8, recu);
+      infos->visibleH = (int)valeurPaquetF(9, 8, recu);
+      infos->visibleD = (int)valeurPaquetF(17, 8, recu);
+      infos->visibleB = (int)valeurPaquetF(25, 8, recu);
 
       // Carte
       if(infos->carteD < infos->visibleD) infos->carteD = infos->visibleD;
       if(infos->carteB < infos->visibleB) infos->carteB = infos->visibleB;
 
-      printf("Bord gauche  : %d\nBord droit   : %d\nBord haut    : %d\nBord bas     : %d\n", infos->visibleG, infos->visibleD, infos->visibleH, infos->visibleB);
+      // printf("Bord gauche  : %d\nBord droit   : %d\nBord haut    : %d\nBord bas     : %d\n", infos->visibleG, infos->visibleD, infos->visibleH, infos->visibleB);
   }
 
 
@@ -164,6 +183,10 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
 
       printf("Pointer vers : ??, ??\n");
+  }
+
+  else if (recu[0] == 49) {
+    // Score
   }
 
 
