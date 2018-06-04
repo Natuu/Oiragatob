@@ -94,7 +94,6 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		fprintf(stderr, "ogar: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 
-		infos = malloc(sizeof(Infos));
 		infos.carteG = 0;
 		infos.carteD = 0;
 		infos.carteH = 0;
@@ -146,8 +145,15 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 				// sendCommand(wsi, command.buf, command.len);
 
 				// Choisir un nom
-				unsigned char pos[] = {0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 ,0x00 ,0x00,0x00, 0x00};
-				sendCommand(wsi, pos, 13);
+				unsigned char pos[] = {0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+				unsigned char *inutile;
+				inutile = malloc(sizeof(unsigned char) * 4);
+				unsigned char *renvoi;
+				paquetValeur(4, 0, inutile);
+				renvoi = malloc(sizeof(unsigned char) * (9 + 4));
+				assemblerPaquets(pos, 9, inutile, 4, renvoi);
+
+				sendCommand(wsi, renvoi, 13);
 
 				offset=0;
 			}

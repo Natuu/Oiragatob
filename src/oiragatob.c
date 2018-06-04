@@ -30,7 +30,6 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
 }
 
 void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
-    paquet = malloc(sizeof(unsigned char) * nombreOctets);
     int i;
 
     paquet[0] = valeur % 256;
@@ -43,7 +42,6 @@ void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
 
 
 void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char *paquet2, int longueurPaquet2, unsigned char *paquet) {
-    paquet = malloc(sizeof(unsigned char) * (longueurPaquet1 + longueurPaquet2);
     int i;
 
     for (i = 0; i < longueurPaquet1; i++) {
@@ -53,14 +51,11 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
     for (i = longueurPaquet1; i < longueurPaquet1 + longueurPaquet2; i++) {
         paquet[i] = paquet2[i];
     }
-
-    free(paquet1);
-    free(paquet2);
 }
 
 
 //Penser au free pour le malloc
-Buffer oiragatob (unsigned char *rbuf, Infos *infos){
+Buffer oiragatob (unsigned char *recu, Infos *infos){
 
   // Variable à modifier en fonction des actions
   int lenRecu;
@@ -125,7 +120,7 @@ Buffer oiragatob (unsigned char *rbuf, Infos *infos){
         parcourCell ++;
 
         cellVivante -> prochaine = malloc(1 * sizeof(Cellule));
-        cellVivante = cellVivante -> prochaine
+        cellVivante = cellVivante -> prochaine;
 
       }
 

@@ -26,15 +26,19 @@ typedef struct infos{
   int posX;
   int posY;
   int taille;
-  int visionG;
-  int visionD;
-  int visionH;
-  int visionB;
+  int visibleG;
+  int visibleD;
+  int visibleH;
+  int visibleB;
   int sourisX;
   int sourisY;
 
 } Infos;
 
-Buffer oiragatob (unsigned char *rbuf, Infos *infos);
+Buffer oiragatob (unsigned char *recu, Infos *infos);
 
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet);
+
+void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet);
+
+void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char *paquet2, int longueurPaquet2, unsigned char *paquet);
