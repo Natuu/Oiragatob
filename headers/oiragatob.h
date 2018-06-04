@@ -10,11 +10,10 @@ typedef struct cellule{
   int id;
   int x;
   int y;
-  int size;
+  int taille;
   int flag;
   int zoneX;
   int zoneY;
-  struct cellule *prochaine;
 
 } Cellule;
 
@@ -40,6 +39,12 @@ Buffer oiragatob (unsigned char *recu, Infos *infos);
 
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet);
 
+double valeurPaquetF (int indiceDepart, int longueurPaquet, unsigned char *paquet);
+
 void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet);
 
 void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char *paquet2, int longueurPaquet2, unsigned char *paquet);
+
+double binToDouble(int64_t x);
+
+void pointerVersPosition (int *sourisX, int *sourisY, int **densite, int nombreZonesX, int nombreZonesY, int posX, int posY, int tailleZoneX, int tailleZoneY, int bordGauche, int bordHaut);

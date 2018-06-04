@@ -6,11 +6,12 @@
 #include <syslog.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <math.h>
 
 #include "headers/client.h"
 #include "headers/oiragatob.h"
 
-// compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets
+// compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
 // call with: ./bot -o agar.io 127.0.0.1:1443
 
 Infos infos;
@@ -99,7 +100,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		infos.carteD = 0;
 		infos.carteH = 0;
 		infos.carteB = 0;
-		infos.taille = 0;
+		infos.taille = 10;
 		infos.posX = 0;
 		infos.posY = 0;
 		infos.visibleG = 0;
@@ -158,7 +159,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
                 // utiliser sendCommand()
 
 				Buffer command = oiragatob(rbuf, &infos);
-				// sendCommand(wsi, command.buf, command.len);
+				sendCommand(wsi, command.buf, command.len);
 
 				offset=0;
 			}
