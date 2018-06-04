@@ -18,14 +18,23 @@ typedef struct cellule{
 
 } Cellule;
 
-typedef struct map{
-  int left;
-  int right;
-  int top;
-  int bottom;
+typedef struct infos{
+  int carteG;
+  int carteD;
+  int carteH;
+  int carteB;
+  int posX;
+  int posY;
+  int taille;
+  int visionG;
+  int visionD;
+  int visionH;
+  int visionB;
+  int sourisX;
+  int sourisY;
 
-} Map;
+} Infos;
 
-Buffer oiragatob (unsigned char *rbuf, Map *mapVisible);
+Buffer oiragatob (unsigned char *rbuf, Infos *infos);
 
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet);
