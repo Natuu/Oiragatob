@@ -13,7 +13,7 @@
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets
 // call with: ./bot -o agar.io 127.0.0.1:1443
 
-Map mapVisible;
+Infos infos;
 
 // =====================================================================================================================================
 //	Start of function definition
@@ -89,9 +89,25 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 	static unsigned int offset=0;
 	static unsigned char rbuf[MAXLEN];
 
+
 	switch (reason) {
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		fprintf(stderr, "ogar: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
+
+		infos = malloc(sizeof(Infos));
+		infos.carteG = 0;
+		infos.carteD = 0;
+		infos.carteH = 0;
+		infos.carteB = 0;
+		infos.taille = 0;
+		infos.posX = 0;
+		infos.posY = 0;
+		infos.visibleG = 0;
+		infos.visibleD = 0;
+		infos.visibleH = 0;
+		infos.visibleB = 0;
+		infos.sourisX = 0;
+		infos.sourisY = 0;
 
 		// Ouvrir la connexion
 		unsigned char connexion[] = {0xff, 0x00, 0x00, 0x00, 0x00};
@@ -126,7 +142,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
                 // Algorythme
                 // utiliser sendCommand()
 
-				Buffer command = oiragatob(rbuf, &mapVisible);
+				Buffer command = oiragatob(rbuf, &infos);
 				// sendCommand(wsi, command.buf, command.len);
 
 				// Choisir un nom

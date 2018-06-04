@@ -31,7 +31,7 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
 
 
 //Penser au free pour le malloc
-Buffer oiragatob (unsigned char *recu, Map *mapVisible){
+Buffer oiragatob (unsigned char *rbuf, Infos *infos){
 
   // Variable à modifier en fonction des actions
   int lenRecu;
@@ -45,16 +45,26 @@ Buffer oiragatob (unsigned char *recu, Map *mapVisible){
     case 17: // Position
       lenRecu = 13;
       printf("Pos recus\n");
+
+      infos->posX = valeurPaquet(1, 4, recu);
+      infos->posY = valeurPaquet(5, 4, recu);
+      infos->taille = valeurPaquet(9, 4, recu);
+      
     break;
 
     case 64: // Bords
       lenRecu = 33;
       printf("Bords recus\n");
 
-      mapVisible->left = valeurPaquet(1, 8, recu);
-      mapVisible->right = valeurPaquet(9, 8, recu);
-      mapVisible->top = valeurPaquet(17, 8, recu);
-      mapVisible->bottom = valeurPaquet(25, 8, recu);
+      // Espace visible
+      infos->visibleG = valeurPaquet(1, 8, recu);
+      infos->visibleD = valeurPaquet(9, 8, recu);
+      infos->visibleH = valeurPaquet(17, 8, recu);
+      infos->visibleB = valeurPaquet(25, 8, recu);
+
+      // Carte
+      if(infos->carteD < infos->visibleD) infos->carteD = infos->visibleD;
+      if(infos->carteB < infos->visibleB) infos->carteB = infos->visibleB;
 
     break;
 
