@@ -11,8 +11,8 @@
 #include "../headers/oiragatob.h"
 
 #define DISTANCECOEFF 1
-#define DENSITECOEFF  10
-#define RESOLUTION    1
+#define DENSITECOEFF  1
+#define RESOLUTION    0.5
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -89,35 +89,35 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     int j;
     float distanceX = 0;
     float distanceY = 0;
-    float tailleZoneX = infos -> taille * RESOLUTION;
-    float tailleZoneY = infos -> taille * RESOLUTION;
-    float bordHaut = infos -> visibleH;
-    float bordGauche = infos -> visibleG;
+    float tailleZoneX = infos->taille * RESOLUTION;
+    float tailleZoneY = infos->taille * RESOLUTION;
     float posX = infos -> posX;
     float posY = infos -> posY;
-    float distance = 0;
+    float distance = 1;
     float ratio = 0;
     float bestRatio = 0;
 
     for (i = 0; i < nombreZonesY; i++) {
         for (j = 0; j < nombreZonesX; j++) {
 
-            distanceX = (tailleZoneX * i + 0.5 * tailleZoneX) - (posX - bordGauche);
-            distanceY = (tailleZoneY * j + 0.5 * tailleZoneY) - (posY - bordHaut);
-            distance = sqrt(distanceX * distanceX + distanceY * distanceY);
+            distanceX = (tailleZoneX * j + 0.5 * tailleZoneX) - posX;
+            distanceY = (tailleZoneY * i + 0.5 * tailleZoneY) - posY;
+            distance = sqrt((distanceX * distanceX) + (distanceY * distanceY));
+
+            if (distance == 0) distance = 1;
 
             ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * distance);
-            // printf("%f ", ratio);
-
 
             if (ratio > bestRatio) {
                 bestRatio = ratio;
-                infos -> sourisX = bordGauche + tailleZoneX * i + 0.5 * tailleZoneX;
-                infos -> sourisY = bordHaut + tailleZoneY * j + 0.5 * tailleZoneY;
+                infos -> sourisX = (int)(tailleZoneX * j + 0.5 * tailleZoneX);
+                infos -> sourisY = (int)(tailleZoneY * i + 0.5 * tailleZoneY);
+
+                printf("from %d, %d   to %d, %d\n", infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
+                printf("%d\n", densite[i][j]);
             }
 
         }
-        // printf("\n");
     }
 }
 
@@ -188,12 +188,11 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       int nombreZonesX;
       int nombreZonesY;
 
-      nombreZonesX = (infos->visibleD - infos->visibleG) / (infos->taille * RESOLUTION);
-      nombreZonesY = (infos->visibleB - infos->visibleH) / (infos->taille * RESOLUTION);
+      nombreZonesX = (infos->carteD - infos->carteG) / (infos->taille * RESOLUTION);
+      nombreZonesY = (infos->carteB - infos->carteH) / (infos->taille * RESOLUTION);
 
       nombreZonesX ++;
       nombreZonesY ++;
-
 
       int **densite;
       densite = malloc(sizeof(int*)*nombreZonesY);
@@ -212,13 +211,13 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
       cellMort = valeurPaquet(1, 2, recu);
 
-      for (i = 3; i < cellMort * 8 + 3; i += 8) {
-          for (j = 0; j < 16; j++) {
-              if(valeurPaquet(i, 4, recu) == infos->idCellules[j]) {
-                  infos->idCellules[j] = 0;
-              }
-          }
-      }
+      // for (i = 3; i < cellMort * 8 + 3; i += 8) {
+      //     for (j = 0; j < 16; j++) {
+      //         if(valeurPaquet(i, 4, recu) == infos->idCellules[j]) {
+      //             infos->idCellules[j] = 0;
+      //         }
+      //     }
+      // }
 
       Cellule cellVivante;
 
@@ -247,9 +246,7 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
             // Si nous appartient
             if(cellVivante.id == infos->idCellules[j]) {
-                if (infos -> taille < cellVivante.taille) {
-                    infos -> taille = cellVivante.taille;
-                }
+                infos -> taille = cellVivante.taille;
                 infos -> posX = cellVivante.x;
                 infos -> posY = cellVivante.y;
             }
@@ -257,30 +254,18 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
         // Si food
         if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
-            zoneX = (cellVivante.x - infos -> visibleG) / (infos->taille * RESOLUTION);
-            zoneY = (cellVivante.y - infos -> visibleH) / (infos->taille * RESOLUTION);
+            zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
+            zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
 
-            if (zoneX >= nombreZonesX) zoneX = nombreZonesX - 1;
-            if (zoneY >= nombreZonesY) zoneY = nombreZonesY - 1;
-            if (zoneX < 0) zoneX = 0;
-            if (zoneY < 0) zoneY = 0;
-
-            // printf("zoneX : %d\n", zoneX);
-            // printf("zoneY : %d\n\n", zoneY);
-            // printf("nombreZonesX : %d\n", nombreZonesX);
-            // printf("nombreZonesY : %d\n\n", nombreZonesY);
-
-            densite[zoneY][zoneX] += cellVivante.taille;
-
-            // if (!(zoneX >= nombreZonesX) && !(zoneY >= nombreZonesY) && !(zoneX < 0) && !(zoneY < 0))
-            // {
-            //   densite[zoneY][zoneX] += cellVivante.taille;
-            // }
+            if (!(zoneX >= nombreZonesX) && !(zoneY >= nombreZonesY) && !(zoneX < 0) && !(zoneY < 0))
+            {
+              densite[zoneY][zoneX] += cellVivante.taille;
+            }
         }
         // Si virus
         else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0) {
-            zoneX = (cellVivante.x - infos -> visibleG) / (infos->taille * RESOLUTION);
-            zoneY = (cellVivante.y - infos -> visibleH) / (infos->taille * RESOLUTION);
+            zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
+            zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
 
             if (infos -> taille > 1.4 * cellVivante.taille) {
                 densite[zoneY][zoneX] += cellVivante.taille;
@@ -322,6 +307,7 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       free(densite);
   }
 
+  // Scores
   else if (recu[0] == 49) {
     // Score
   }
