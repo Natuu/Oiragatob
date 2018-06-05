@@ -112,9 +112,6 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                 bestRatio = ratio;
                 infos -> sourisX = (int)(tailleZoneX * j + 0.5 * tailleZoneX);
                 infos -> sourisY = (int)(tailleZoneY * i + 0.5 * tailleZoneY);
-
-                printf("from %d, %d   to %d, %d\n", infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
-                printf("%d\n", densite[i][j]);
             }
 
         }
