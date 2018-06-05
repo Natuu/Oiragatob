@@ -10,7 +10,7 @@
 
 #include "../headers/oiragatob.h"
 
-#define DISTANCECOEFF 1
+#define DISTANCECOEFF 70
 #define DENSITECOEFF  1
 #define RESOLUTION    0.5
 
@@ -118,7 +118,71 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     }
 }
 
-//Penser au free pour le malloc
+void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole) {
+  int j;
+  int zoneX = 0;
+  int zoneY = 0;
+  float distance = 0;
+  float attrait = 0;
+
+  int plusPetit = 999999;
+
+  int k;
+  int l;
+
+  // On selectionne la plus grosse de nos cellules
+  for (j = 0; j < 16; j++) {
+
+      // Si nous appartient
+      if(cellVivante.id == infos->idCellules[j] && cellVivante.taille <= plusPetit) {
+          infos -> taille = cellVivante.taille;
+          infos -> posX = cellVivante.x;
+          infos -> posY = cellVivante.y;
+          plusPetit = infos -> taille;
+      }
+  }
+
+  zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
+  zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
+
+  // Si food
+  if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
+    attrait = 1;
+  }
+  // Si virus
+  else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0) {
+      if (infos -> taille > 1.4 * cellVivante.taille) {
+          attrait = 0.8;
+      }
+  }
+
+  else if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1)
+  {
+    if (infos -> taille > 1.4 * cellVivante.taille) {
+        attrait = 1;
+    }
+    else if (infos -> taille < 1.4 * cellVivante.taille){
+      attrait = -5;
+    }
+    else {
+      attrait = 0;
+    }
+  }
+
+  for (k = -tailleAureole; k < tailleAureole; k++) {
+    for (l =  -tailleAureole; l <  tailleAureole; l++) {
+
+      if (!(zoneX + k + 1 >= nombreZonesX) && !(zoneY + l + 1 >= nombreZonesY) && !(zoneX + k - 1 < 0) && !(zoneY + l - 1< 0)) {
+        distance = sqrt(k*k + l*l);
+        if (distance == 0) {
+          distance = 0.01;
+        }
+        densite[zoneY][zoneX] += cellVivante.taille * attrait / distance;
+      }
+    }
+  }
+}
+
 Buffer oiragatob (unsigned char *recu, Infos *infos){
 
   // Variable à modifier en fonction des actions
@@ -203,9 +267,6 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
         }
       }
 
-      int zoneX = 0;
-      int zoneY = 0;
-
       cellMort = valeurPaquet(1, 2, recu);
 
       // for (i = 3; i < cellMort * 8 + 3; i += 8) {
@@ -237,37 +298,7 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
             parcourCell ++;
         }
 
-
-        // On selectionne la plus grosse de nos cellules
-        for (j = 0; j < 16; j++) {
-
-            // Si nous appartient
-            if(cellVivante.id == infos->idCellules[j]) {
-                infos -> taille = cellVivante.taille;
-                infos -> posX = cellVivante.x;
-                infos -> posY = cellVivante.y;
-            }
-        }
-
-        // Si food
-        if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
-            zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
-            zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
-
-            if (!(zoneX >= nombreZonesX) && !(zoneY >= nombreZonesY) && !(zoneX < 0) && !(zoneY < 0))
-            {
-              densite[zoneY][zoneX] += cellVivante.taille;
-            }
-        }
-        // Si virus
-        else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0) {
-            zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
-            zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
-
-            if (infos -> taille > 1.4 * cellVivante.taille) {
-                densite[zoneY][zoneX] += cellVivante.taille;
-            }
-        }
+        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 15);
       }
 
       pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);

@@ -46,3 +46,6 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
 double binToDouble(int64_t x);
 
 void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int **densite);
+
+
+void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole);
