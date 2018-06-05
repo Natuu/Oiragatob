@@ -190,7 +190,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
         distance = sqrt(k*k + l*l);
 
         // Cellule centrale 10 fois plus importante que celles juste autour
-        if (distance == 0)   distance = 0.01;
+        if (distance == 0)   distance = 0.001;
 
         densite[zoneY + l][zoneX + k] += cellVivante.taille * attrait / distance;
       }
