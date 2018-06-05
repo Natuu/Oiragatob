@@ -7,13 +7,11 @@ typedef struct buffer{
 
 typedef struct cellule{
 
-  int id;
+  unsigned int id;
   int x;
   int y;
-  int taille;
-  int flag;
-  int zoneX;
-  int zoneY;
+  unsigned int taille;
+  unsigned int flag;
 
 } Cellule;
 
@@ -22,7 +20,7 @@ typedef struct infos{
   int carteD;
   int carteH;
   int carteB;
-  int idCellules[16];
+  unsigned int idCellules[16];
   int posX;
   int posY;
   int taille;
@@ -47,4 +45,4 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
 
 double binToDouble(int64_t x);
 
-void pointerVersPosition (int *sourisX, int *sourisY, int nombreZonesX, int nombreZonesY, int densite[nombreZonesX][nombreZonesY], int posX, int posY, int tailleZoneX, int tailleZoneY, int bordGauche, int bordHaut);
+void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int **densite);

@@ -11,7 +11,8 @@
 #include "../headers/oiragatob.h"
 
 #define DISTANCECOEFF 1
-#define DENSITECOEFF  1000
+#define DENSITECOEFF  10
+#define RESOLUTION    1
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -64,9 +65,7 @@ double valeurPaquetF (int indiceDepart, int longueurPaquet, unsigned char *paque
 void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
     int i;
 
-    paquet[0] = valeur % 256;
-
-    for (i = 1; i < nombreOctets; i++) {
+    for (i = 0; i < nombreOctets; i++) {
         paquet[i] = valeur % 256;
         valeur /= 256;
     }
@@ -78,49 +77,48 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
     for (i = 0; i < longueurPaquet1; i++) {
         paquet[i] = paquet1[i];
     }
-
+    // Cause du seg Fault !!!!!!!!
     for (i = longueurPaquet1; i < longueurPaquet1 + longueurPaquet2; i++) {
-        paquet[i] = paquet2[i];
+        paquet[i] = paquet2[i - longueurPaquet1];
     }
 }
 
-void pointerVersPosition (int *sourisX, int *sourisY, int nombreZonesX, int nombreZonesY, int densite[nombreZonesX][nombreZonesY], int posX, int posY, int tailleZoneX, int tailleZoneY, int bordGauche, int bordHaut) {
+void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int **densite) {
 
     int i;
     int j;
-    int distanceX = 0;
-    int distanceY = 0;
-    int distance = 0;
+    float distanceX = 0;
+    float distanceY = 0;
+    float tailleZoneX = infos -> taille * RESOLUTION;
+    float tailleZoneY = infos -> taille * RESOLUTION;
+    float bordHaut = infos -> visibleH;
+    float bordGauche = infos -> visibleG;
+    float posX = infos -> posX;
+    float posY = infos -> posY;
+    float distance = 0;
     float ratio = 0;
     float bestRatio = 0;
 
-    *sourisX = 0;
-    *sourisY = 0;
-
-
-    for (i = 0; i < nombreZonesX; i++) {
-        for (j = 0; j < nombreZonesY; j++) {
+    for (i = 0; i < nombreZonesY; i++) {
+        for (j = 0; j < nombreZonesX; j++) {
 
             distanceX = (tailleZoneX * i + 0.5 * tailleZoneX) - (posX - bordGauche);
             distanceY = (tailleZoneY * j + 0.5 * tailleZoneY) - (posY - bordHaut);
             distance = sqrt(distanceX * distanceX + distanceY * distanceY);
 
-            ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * (float)distance);
+            ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * distance);
             // printf("%f ", ratio);
 
 
             if (ratio > bestRatio) {
                 bestRatio = ratio;
-                *sourisX = tailleZoneX * i + 0.5 * tailleZoneX;
-                *sourisY = tailleZoneY * j + 0.5 * tailleZoneY;
+                infos -> sourisX = bordGauche + tailleZoneX * i + 0.5 * tailleZoneX;
+                infos -> sourisY = bordHaut + tailleZoneY * j + 0.5 * tailleZoneY;
             }
 
         }
         // printf("\n");
     }
-
-    printf("Pointer vers : %d, %d\n", *sourisX, *sourisY);
-
 }
 
 //Penser au free pour le malloc
@@ -156,9 +154,9 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
   // Ajout cellule
   else if (recu[0] == 32) {
 
-    int i;
+    int i = 0;
 
-    while (infos->idCellules[i] != 0) i++;
+    while (infos->idCellules[i] != 0 && i < 16) i++;
 
     infos->idCellules[i] = valeurPaquet(1, 4, recu);
 
@@ -187,26 +185,30 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       int i;
       int j;
 
-      int nombreZonesX = (infos->visibleD - infos->visibleG) / (infos->taille * 0.7);
-      int nombreZonesY = (infos->visibleB - infos->visibleH) / (infos->taille * 0.7);
-      int densite[nombreZonesX][nombreZonesY];
+      int nombreZonesX;
+      int nombreZonesY;
 
-      for (i = 0; i < nombreZonesX; i++) {
-        for (j = 0; j < nombreZonesY; j++) {
+      nombreZonesX = (infos->visibleD - infos->visibleG) / (infos->taille * RESOLUTION);
+      nombreZonesY = (infos->visibleB - infos->visibleH) / (infos->taille * RESOLUTION);
+
+      nombreZonesX ++;
+      nombreZonesY ++;
+
+
+      int **densite;
+      densite = malloc(sizeof(int*)*nombreZonesY);
+      for (i = 0; i < nombreZonesY; i++) {
+        densite[i] = malloc(sizeof(int)*nombreZonesX);
+      }
+
+      for (i = 0; i < nombreZonesY; i++) {
+        for (j = 0; j < nombreZonesX; j++) {
           densite[i][j] = 0;
         }
       }
 
       int zoneX = 0;
       int zoneY = 0;
-
-      int *sourisX;
-      int *sourisY;
-
-      sourisX = malloc(sizeof(int));
-      sourisY = malloc(sizeof(int));
-
-      Cellule *cellVivante;
 
       cellMort = valeurPaquet(1, 2, recu);
 
@@ -218,19 +220,21 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
           }
       }
 
-      cellVivante = malloc(sizeof(Cellule));
+      Cellule cellVivante;
+
       // Tri du buffer
       int parcourCell = 3 + cellMort * 8;
 
-      while (recu[parcourCell] + recu[parcourCell + 1] + recu[parcourCell + 2] + recu[parcourCell + 3] != 0){
+      while (recu[parcourCell] != 0){
+        // printf("recu[%d] = %x\n", parcourCell, recu[parcourCell]);
 
-        cellVivante -> id = valeurPaquet(parcourCell, 4, recu);
-        cellVivante -> x = valeurPaquet((parcourCell + 4), 4, recu);
-        cellVivante -> y = valeurPaquet((parcourCell + 8), 4, recu);
-        cellVivante -> taille = valeurPaquet((parcourCell + 12), 2, recu);
-        cellVivante -> flag = valeurPaquet((parcourCell + 14), 1, recu);
+        cellVivante.id = valeurPaquet(parcourCell, 4, recu);
+        cellVivante.x = valeurPaquet((parcourCell + 4), 4, recu);
+        cellVivante.y = valeurPaquet((parcourCell + 8), 4, recu);
+        cellVivante.taille = valeurPaquet((parcourCell + 12), 2, recu);
+        cellVivante.flag = valeurPaquet((parcourCell + 14), 1, recu);
         parcourCell += 18;
-        if (cellVivante -> flag & 8) {
+        if (cellVivante.flag & 8) {
             while(recu[parcourCell] != 0){
               parcourCell ++;
             }
@@ -240,35 +244,51 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
         // On selectionne la plus grosse de nos cellules
         for (j = 0; j < 16; j++) {
+
             // Si nous appartient
-            if(cellVivante -> id == infos->idCellules[j]) {
-                if (infos -> taille < cellVivante -> taille) {
-                    infos -> taille = cellVivante -> taille;
+            if(cellVivante.id == infos->idCellules[j]) {
+                if (infos -> taille < cellVivante.taille) {
+                    infos -> taille = cellVivante.taille;
                 }
-                infos -> posX = cellVivante -> x;
-                infos -> posY = cellVivante -> y;
+                infos -> posX = cellVivante.x;
+                infos -> posY = cellVivante.y;
             }
         }
 
         // Si food
-        if ((cellVivante -> flag & 1) == 0 && (cellVivante -> flag & 8) == 0) {
-            zoneX = (cellVivante -> x - infos -> visibleG) / (infos->taille * 0.7);
-            zoneY = (cellVivante -> y - infos -> visibleH) / (infos->taille * 0.7);
+        if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
+            zoneX = (cellVivante.x - infos -> visibleG) / (infos->taille * RESOLUTION);
+            zoneY = (cellVivante.y - infos -> visibleH) / (infos->taille * RESOLUTION);
 
-            densite[zoneX][zoneY] += cellVivante -> taille;
+            if (zoneX >= nombreZonesX) zoneX = nombreZonesX - 1;
+            if (zoneY >= nombreZonesY) zoneY = nombreZonesY - 1;
+            if (zoneX < 0) zoneX = 0;
+            if (zoneY < 0) zoneY = 0;
+
+            // printf("zoneX : %d\n", zoneX);
+            // printf("zoneY : %d\n\n", zoneY);
+            // printf("nombreZonesX : %d\n", nombreZonesX);
+            // printf("nombreZonesY : %d\n\n", nombreZonesY);
+
+            densite[zoneY][zoneX] += cellVivante.taille;
+
+            // if (!(zoneX >= nombreZonesX) && !(zoneY >= nombreZonesY) && !(zoneX < 0) && !(zoneY < 0))
+            // {
+            //   densite[zoneY][zoneX] += cellVivante.taille;
+            // }
         }
         // Si virus
-        else if ((cellVivante -> flag & 1) == 1 && (cellVivante -> flag & 8) == 0) {
-            zoneX = (cellVivante -> x - infos -> visibleG) / (infos->taille * 0.7);
-            zoneY = (cellVivante -> y - infos -> visibleH) / (infos->taille * 0.7);
+        else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0) {
+            zoneX = (cellVivante.x - infos -> visibleG) / (infos->taille * RESOLUTION);
+            zoneY = (cellVivante.y - infos -> visibleH) / (infos->taille * RESOLUTION);
 
-            if (infos -> taille > 1.4 * cellVivante -> taille) {
-                densite[zoneX][zoneY] += cellVivante -> taille;
+            if (infos -> taille > 1.4 * cellVivante.taille) {
+                densite[zoneY][zoneX] += cellVivante.taille;
             }
         }
       }
 
-      pointerVersPosition (sourisX, sourisY, nombreZonesX, nombreZonesY, densite, infos -> posX, infos -> posY, (infos->taille * 0.7), (infos->taille * 0.7), infos -> visibleG, infos -> visibleH);
+      pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
 
 
       // Envoi du paquet
@@ -283,8 +303,8 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       unsigned char *uselessPaquet;
       uselessPaquet = malloc(sizeof(unsigned char) * 4);
       paquetValeur(1, 16, idPaquet);
-      paquetValeur(4, *sourisX, xPaquet);
-      paquetValeur(4, *sourisY, yPaquet);
+      paquetValeur(4, infos->sourisX, xPaquet);
+      paquetValeur(4, infos->sourisY, yPaquet);
       paquetValeur(4, 0, uselessPaquet);
 
       //Initialisation du pointeur
@@ -298,6 +318,8 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       assemblerPaquets(paquetIntermediaire1, 5, yPaquet, 4, paquetIntermediaire2);
       // Derniers paquets
       assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi.buf);
+
+      free(densite);
   }
 
   else if (recu[0] == 49) {

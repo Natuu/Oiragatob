@@ -153,11 +153,6 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 			if (lws_is_final_fragment(wsi)) {
 				// call recv function here !!!!
 
-
-                // Parser rbuff
-                // Algorythme
-                // utiliser sendCommand()
-
 				Buffer command = oiragatob(rbuf, &infos);
 				sendCommand(wsi, command.buf, command.len);
 
