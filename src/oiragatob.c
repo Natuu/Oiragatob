@@ -10,6 +10,7 @@
 
 #include "../headers/oiragatob.h"
 
+// Fine tuning
 #define DISTANCECOEFF 70
 #define DENSITECOEFF  1
 #define RESOLUTION    0.5
@@ -34,6 +35,7 @@ int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
     return valeur;
 }
 
+// Convertit une valeur binaire en flottant
 double binToDouble(int64_t x) {
     union {
         int64_t  x;
@@ -43,6 +45,7 @@ double binToDouble(int64_t x) {
     return temp.f;
 }
 
+// Permet de convertir un groupe d'octets en flottant
 double valeurPaquetF (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
     int64_t valeur=0;
     int64_t paquetActuel;
@@ -62,6 +65,7 @@ double valeurPaquetF (int indiceDepart, int longueurPaquet, unsigned char *paque
     return binToDouble(valeur);
 }
 
+// Code une valeur entière en un paquet de nombreOctets
 void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
     int i;
 
@@ -71,6 +75,7 @@ void paquetValeur (int nombreOctets, int valeur, unsigned char *paquet) {
     }
 }
 
+// Assemble 2 paquets
 void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char *paquet2, int longueurPaquet2, unsigned char *paquet) {
     int i;
 
@@ -83,6 +88,7 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
     }
 }
 
+// Définit la position de la souris
 void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int **densite) {
 
     int i;
@@ -108,6 +114,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
             ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * distance);
 
+            // On selectionne la meilleure cellule
             if (ratio > bestRatio) {
                 bestRatio = ratio;
                 infos -> sourisX = (int)(tailleZoneX * j + 0.5 * tailleZoneX);
@@ -118,6 +125,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     }
 }
 
+// Remplis la grille de densité
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole) {
   int j;
   int zoneX = 0;
@@ -130,10 +138,10 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
   int k;
   int l;
 
-  // On selectionne la plus grosse de nos cellules
+  // On selectionne la plus petite de nos cellules
   for (j = 0; j < 16; j++) {
 
-      // Si nous appartient
+      // On update la position et la taille
       if(cellVivante.id == infos->idCellules[j] && cellVivante.taille <= plusPetit) {
           infos -> taille = cellVivante.taille;
           infos -> posX = cellVivante.x;
@@ -142,8 +150,11 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
       }
   }
 
+  // Indice de la case centrale du remplissage
   zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
   zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
+
+  // Gestion de l'attrait de la cellule
 
   // Si food
   if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
@@ -155,39 +166,46 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
           attrait = 0.8;
       }
   }
-
+  // Si méchant
   else if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1)
   {
     if (infos -> taille > 1.4 * cellVivante.taille) {
         attrait = 1;
     }
     else if (infos -> taille < 1.4 * cellVivante.taille){
-      attrait = -5;
+      attrait = -10;
     }
     else {
       attrait = 0;
     }
   }
 
+  // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
   for (k = -tailleAureole; k < tailleAureole; k++) {
     for (l =  -tailleAureole; l <  tailleAureole; l++) {
 
-      if (!(zoneX + k + 1 >= nombreZonesX) && !(zoneY + l + 1 >= nombreZonesY) && !(zoneX + k - 1 < 0) && !(zoneY + l - 1< 0)) {
+      // On évite le segfault...
+      if (zoneX + k < nombreZonesX && zoneY + l < nombreZonesY && zoneX + k >= 0 && zoneY + l >= 0) {
+
         distance = sqrt(k*k + l*l);
-        if (distance == 0) {
-          distance = 0.01;
-        }
-        densite[zoneY][zoneX] += cellVivante.taille * attrait / distance;
+
+        // Cellule centrale 10 fois plus importante que celles juste autour
+        if (distance == 0)   distance = 0.01;
+
+        densite[zoneY + l][zoneX + k] += cellVivante.taille * attrait / distance;
       }
     }
   }
 }
 
+
+// Fonction principale
 Buffer oiragatob (unsigned char *recu, Infos *infos){
 
-  // Variable à modifier en fonction des actions
   int len = 0;
   int cellMort;
+
+  // Retour de la fonction
   Buffer envoi;
 
   // Position
@@ -246,29 +264,35 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       int i;
       int j;
 
+      // Mappage
       int nombreZonesX;
       int nombreZonesY;
 
       nombreZonesX = (infos->carteD - infos->carteG) / (infos->taille * RESOLUTION);
       nombreZonesY = (infos->carteB - infos->carteH) / (infos->taille * RESOLUTION);
 
+      // On pense aux zones coupées
       nombreZonesX ++;
       nombreZonesY ++;
 
+      // Allocation de la mémoire de la densité
       int **densite;
       densite = malloc(sizeof(int*)*nombreZonesY);
       for (i = 0; i < nombreZonesY; i++) {
         densite[i] = malloc(sizeof(int)*nombreZonesX);
       }
 
+      // Mise à 0 de la densité
       for (i = 0; i < nombreZonesY; i++) {
         for (j = 0; j < nombreZonesX; j++) {
           densite[i][j] = 0;
         }
       }
 
+      // Nombre de cellules mortes
       cellMort = valeurPaquet(1, 2, recu);
 
+      // Retirer nos cellules mortes
       // for (i = 3; i < cellMort * 8 + 3; i += 8) {
       //     for (j = 0; j < 16; j++) {
       //         if(valeurPaquet(i, 4, recu) == infos->idCellules[j]) {
@@ -282,8 +306,8 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       // Tri du buffer
       int parcourCell = 3 + cellMort * 8;
 
+      // Traitement des cellules une à une
       while (recu[parcourCell] != 0){
-        // printf("recu[%d] = %x\n", parcourCell, recu[parcourCell]);
 
         cellVivante.id = valeurPaquet(parcourCell, 4, recu);
         cellVivante.x = valeurPaquet((parcourCell + 4), 4, recu);
@@ -298,15 +322,18 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
             parcourCell ++;
         }
 
+        // Remplissage de la grille de densité
         hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 15);
       }
 
+      //
       pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
 
 
       // Envoi du paquet
       len = 13;
 
+      // Envoi du paquet
       unsigned char *idPaquet;
       idPaquet = malloc(sizeof(unsigned char) * 1);
       unsigned char *xPaquet;
@@ -333,6 +360,12 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
       assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi.buf);
 
       free(densite);
+      free(idPaquet);
+      free(xPaquet);
+      free(yPaquet);
+      free(uselessPaquet);
+      free(paquetIntermediaire1);
+      free(paquetIntermediaire2);
   }
 
   // Scores

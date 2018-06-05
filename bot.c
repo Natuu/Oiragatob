@@ -96,6 +96,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 	case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		fprintf(stderr, "ogar: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 
+		// Initialisation
 		infos.carteG = 0;
 		infos.carteD = 0;
 		infos.carteH = 0;
@@ -126,17 +127,6 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		unsigned char nom[] = {0x00, 'O', 'i', 'r', 'a', 'g', 'a', 't', 'o', 'b', 0x00};
 		sendCommand(wsi, nom, 11);
 
-		// Choisir une direction
-		unsigned char pos[] = {0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-		unsigned char *inutile;
-		inutile = malloc(sizeof(unsigned char) * 4);
-		unsigned char *renvoi;
-		paquetValeur(4, 0, inutile);
-		renvoi = malloc(sizeof(unsigned char) * (9 + 4));
-		assemblerPaquets(pos, 9, inutile, 4, renvoi);
-
-		sendCommand(wsi, renvoi, 13);
-
 		break;
 
  	case LWS_CALLBACK_CLIENT_WRITEABLE:
@@ -152,6 +142,8 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 			// we have receive some data, check with websocket API if this is a final fragment
 			if (lws_is_final_fragment(wsi)) {
 				// call recv function here !!!!
+
+				// FONCTION PRINCIPALE
 
 				Buffer command = oiragatob(rbuf, &infos);
 				sendCommand(wsi, command.buf, command.len);
