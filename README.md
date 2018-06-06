@@ -47,4 +47,4 @@ Elle se dirige vers la zone la plus attrayante en fonction de sa distance.
 
 ### Split
 En solo le bot va se splitter le plus possible.
-En multi, il se splittera si une zone permet au morceau ejecté de retrouver la taille qu'il avait avant split *fois un fateur*.
+En multi, il se splittera si une zone permet au morceau ejecté de retrouver la taille qu'il avait avant split *fois un facteur*.
