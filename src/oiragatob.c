@@ -11,9 +11,9 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF 70
+#define DISTANCECOEFF 100
 #define DENSITECOEFF  1
-#define RESOLUTION    0.5
+#define RESOLUTION    0.4
 #define SOLO          1
 
 // Permet de convertir un groupe d'octets en int
@@ -90,15 +90,13 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
 }
 
 // Remplis la grille de densité
-void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole) {
+void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole, int food, int ennemis, int virus) {
   int j;
   int zoneX = 0;
   int zoneY = 0;
   float distance = 0;
   float attrait = 0;
   int auBot = 0;
-
-  int plusPetit = 999999;
 
   int k;
   int l;
@@ -109,11 +107,16 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
       // On update la position et la taille
       if(cellVivante.id == infos->idCellules[j]) {
         auBot = 1;
-        if (cellVivante.taille <= plusPetit) {
+        // printf("ID: %d Cell : %d  PosX: %d   PosY: %d\n", j, cellVivante.id, cellVivante.x, cellVivante.y);
+
+        if (cellVivante.taille < infos -> plusPetiteTaille) {
+          infos -> plusPetiteTaille = cellVivante.taille;
+        }
+        if (cellVivante.taille > infos -> plusGrosseTaille) {
           infos -> taille = cellVivante.taille;
+          infos -> plusGrosseTaille = cellVivante.taille;
           infos -> posX = cellVivante.x;
           infos -> posY = cellVivante.y;
-          plusPetit = infos -> taille;
         }
       }
   }
@@ -125,30 +128,31 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
   // Gestion de l'attrait de la cellule
 
   // Si food
-  if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
+  if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0 && food) {
     attrait = 1;
   }
   // Si virus
-  else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0) {
-      if (infos -> taille > 1.4 * cellVivante.taille) {
-          attrait = 0.8;
+  if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
+      if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
+          attrait = 1;
       }
   }
   // Si méchant
-  else if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1 && auBot == 0)
+  if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1 && auBot == 0 && ennemis)
   {
-    if (infos -> taille > 1.4 * cellVivante.taille) {
+    if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
         attrait = 1;
     }
-    else if (infos -> taille < 1.4 * cellVivante.taille){
-      attrait = -10;
+    else if (infos -> plusGrosseTaille < 1.4 * cellVivante.taille){
+      attrait = -10000000;
     }
     else {
       attrait = 0;
     }
   }
+
   // Si Bot
-  else if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1 && auBot == 1 && SOLO){
+  if (auBot == 1){
     attrait = 0;
   }
 
@@ -187,7 +191,6 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     float bestRatio = 0;
     infos -> split = 0;
 
-    printf("%d\n", infos -> taille);
     for (i = 0; i < nombreZonesY; i++) {
         for (j = 0; j < nombreZonesX; j++) {
 
@@ -292,10 +295,13 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
   else if (recu[0] == 32) {
 
     int i = 0;
+    int aAjouter = valeurPaquet(1, 4, recu);
 
-    while (infos->idCellules[i] != 0 && i < 16) i++;
+    while (infos->idCellules[i] != 0 && i < 16 && infos->idCellules[i] != aAjouter) i++;
 
-    infos->idCellules[i] = valeurPaquet(1, 4, recu);
+    if (infos->idCellules[i] == 0) {
+      infos->idCellules[i] = aAjouter;
+    }
 
     // printf("Ajout cellule d'ID : %d\n", infos->idCellules[i]);
   }
@@ -326,6 +332,8 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
       // Mappage
       int nombreZonesX;
       int nombreZonesY;
+
+      infos -> plusGrosseTaille = 0;
 
       nombreZonesX = (infos->carteD - infos->carteG) / (infos->taille * RESOLUTION);
       nombreZonesY = (infos->carteB - infos->carteH) / (infos->taille * RESOLUTION);
@@ -382,7 +390,8 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
         }
 
         // Remplissage de la grille de densité
-        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 15);
+        // On hydrate une fois sans virus ni ennemis et une fois avec
+        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 10, 1, !SOLO, 1);
       }
 
       //

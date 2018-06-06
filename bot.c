@@ -102,6 +102,8 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		infos.carteH = 0;
 		infos.carteB = 0;
 		infos.taille = 10;
+		infos.plusPetiteTaille = 0;
+		infos.plusGrosseTaille = 999999;
 		infos.posX = 0;
 		infos.posY = 0;
 		infos.visibleG = 0;

@@ -24,6 +24,8 @@ typedef struct infos{
   int posX;
   int posY;
   int taille;
+  int plusPetiteTaille;
+  int plusGrosseTaille;
   int visibleG;
   int visibleD;
   int visibleH;
@@ -50,4 +52,4 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
 void creerPaquetDeplacement(Buffer *envoi, Infos *infos);
 
-void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole);
+void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole, int food, int ennemis, int virus);

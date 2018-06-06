@@ -1,5 +1,5 @@
 #include "libwebsockets.h"
-#define MAXLEN 30000
+#define MAXLEN 50000
 
 static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
 
