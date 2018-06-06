@@ -30,10 +30,11 @@ typedef struct infos{
   int visibleB;
   int sourisX;
   int sourisY;
+  int split;
 
 } Infos;
 
-Buffer oiragatob (unsigned char *recu, Infos *infos);
+void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos);
 
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet);
 
@@ -47,5 +48,6 @@ double binToDouble(int64_t x);
 
 void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int **densite);
 
+void creerPaquetDeplacement(Buffer *envoi, Infos *infos);
 
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole);

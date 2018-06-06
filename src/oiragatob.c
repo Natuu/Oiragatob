@@ -125,6 +125,53 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     }
 }
 
+
+void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
+
+  if (infos -> split == 1){
+    envoi -> len = 1;
+    envoi -> buf = malloc(envoi -> len * sizeof(unsigned char));
+    paquetValeur(1, 17, envoi -> buf);
+
+  } else {
+    // Envoi du paquet
+    envoi -> len = 13;
+
+    // Envoi du paquet
+    unsigned char *idPaquet;
+    idPaquet = malloc(sizeof(unsigned char) * 1);
+    unsigned char *xPaquet;
+    xPaquet = malloc(sizeof(unsigned char) * 4);
+    unsigned char *yPaquet;
+    yPaquet = malloc(sizeof(unsigned char) * 4);
+    unsigned char *uselessPaquet;
+    uselessPaquet = malloc(sizeof(unsigned char) * 4);
+    paquetValeur(1, 16, idPaquet);
+    paquetValeur(4, infos->sourisX, xPaquet);
+    paquetValeur(4, infos->sourisY, yPaquet);
+    paquetValeur(4, 0, uselessPaquet);
+
+    //Initialisation du pointeur
+    envoi -> buf = malloc(envoi -> len * sizeof(unsigned char));
+
+    unsigned char *paquetIntermediaire1;
+    paquetIntermediaire1 = malloc(sizeof(unsigned char) * 5);
+    assemblerPaquets(idPaquet, 1, xPaquet, 4, paquetIntermediaire1);
+    unsigned char *paquetIntermediaire2;
+    paquetIntermediaire2 = malloc(sizeof(unsigned char) * 9);
+    assemblerPaquets(paquetIntermediaire1, 5, yPaquet, 4, paquetIntermediaire2);
+    // Derniers paquets
+    assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi -> buf);
+
+    free(idPaquet);
+    free(xPaquet);
+    free(yPaquet);
+    free(uselessPaquet);
+    free(paquetIntermediaire1);
+    free(paquetIntermediaire2);
+  }
+}
+
 // Remplis la grille de densité
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole) {
   int j;
@@ -200,13 +247,9 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
 
 
 // Fonction principale
-Buffer oiragatob (unsigned char *recu, Infos *infos){
+void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
-  int len = 0;
   int cellMort;
-
-  // Retour de la fonction
-  Buffer envoi;
 
   // Position
   if (recu[0] == 17) {
@@ -328,44 +371,9 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
       //
       pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
-
-
-      // Envoi du paquet
-      len = 13;
-
-      // Envoi du paquet
-      unsigned char *idPaquet;
-      idPaquet = malloc(sizeof(unsigned char) * 1);
-      unsigned char *xPaquet;
-      xPaquet = malloc(sizeof(unsigned char) * 4);
-      unsigned char *yPaquet;
-      yPaquet = malloc(sizeof(unsigned char) * 4);
-      unsigned char *uselessPaquet;
-      uselessPaquet = malloc(sizeof(unsigned char) * 4);
-      paquetValeur(1, 16, idPaquet);
-      paquetValeur(4, infos->sourisX, xPaquet);
-      paquetValeur(4, infos->sourisY, yPaquet);
-      paquetValeur(4, 0, uselessPaquet);
-
-      //Initialisation du pointeur
-      envoi.buf = malloc(len * sizeof(unsigned char));
-
-      unsigned char *paquetIntermediaire1;
-      paquetIntermediaire1 = malloc(sizeof(unsigned char) * 5);
-      assemblerPaquets(idPaquet, 1, xPaquet, 4, paquetIntermediaire1);
-      unsigned char *paquetIntermediaire2;
-      paquetIntermediaire2 = malloc(sizeof(unsigned char) * 9);
-      assemblerPaquets(paquetIntermediaire1, 5, yPaquet, 4, paquetIntermediaire2);
-      // Derniers paquets
-      assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi.buf);
-
       free(densite);
-      free(idPaquet);
-      free(xPaquet);
-      free(yPaquet);
-      free(uselessPaquet);
-      free(paquetIntermediaire1);
-      free(paquetIntermediaire2);
+      creerPaquetDeplacement(envoi, infos);
+
   }
 
   // Scores
@@ -375,9 +383,5 @@ Buffer oiragatob (unsigned char *recu, Infos *infos){
 
 
   else printf("Paquet inconnu d'OPCODE %d\n", recu[0]);
-
-
-  envoi.len = len;
-  return envoi;
 
 }

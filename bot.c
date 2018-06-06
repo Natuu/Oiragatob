@@ -110,6 +110,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		infos.visibleB = 0;
 		infos.sourisX = 0;
 		infos.sourisY = 0;
+		infos.split = 0;
 
 		for (i = 0; i < 16; i++) {
 			infos.idCellules[i] = 0;
@@ -145,7 +146,8 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 
 				// FONCTION PRINCIPALE
 
-				Buffer command = oiragatob(rbuf, &infos);
+				Buffer command;
+				oiragatob(rbuf, &command, &infos);
 				sendCommand(wsi, command.buf, command.len);
 
 				offset=0;
