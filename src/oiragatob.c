@@ -14,6 +14,7 @@
 #define DISTANCECOEFF 70
 #define DENSITECOEFF  1
 #define RESOLUTION    0.5
+#define SOLO          1
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -88,11 +89,93 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
     }
 }
 
+// Remplis la grille de densité
+void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole) {
+  int j;
+  int zoneX = 0;
+  int zoneY = 0;
+  float distance = 0;
+  float attrait = 0;
+  int auBot = 0;
+
+  int plusPetit = 999999;
+
+  int k;
+  int l;
+
+  // On selectionne la plus petite de nos cellules
+  for (j = 0; j < 16; j++) {
+
+      // On update la position et la taille
+      if(cellVivante.id == infos->idCellules[j]) {
+        auBot = 1;
+        if (cellVivante.taille <= plusPetit) {
+          infos -> taille = cellVivante.taille;
+          infos -> posX = cellVivante.x;
+          infos -> posY = cellVivante.y;
+          plusPetit = infos -> taille;
+        }
+      }
+  }
+
+  // Indice de la case centrale du remplissage
+  zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
+  zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
+
+  // Gestion de l'attrait de la cellule
+
+  // Si food
+  if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
+    attrait = 1;
+  }
+  // Si virus
+  else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0) {
+      if (infos -> taille > 1.4 * cellVivante.taille) {
+          attrait = 0.8;
+      }
+  }
+  // Si méchant
+  else if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1 && auBot == 0)
+  {
+    if (infos -> taille > 1.4 * cellVivante.taille) {
+        attrait = 1;
+    }
+    else if (infos -> taille < 1.4 * cellVivante.taille){
+      attrait = -10;
+    }
+    else {
+      attrait = 0;
+    }
+  }
+  // Si Bot
+  else if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1 && auBot == 1 && SOLO){
+    attrait = 0;
+  }
+
+  // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
+  for (k = -tailleAureole; k < tailleAureole; k++) {
+    for (l =  -tailleAureole; l <  tailleAureole; l++) {
+
+      // On évite le segfault...
+      if (zoneX + k < nombreZonesX && zoneY + l < nombreZonesY && zoneX + k >= 0 && zoneY + l >= 0) {
+
+        distance = sqrt(k*k + l*l);
+
+        // Cellule centrale 100 fois plus importante que celles juste autour
+        if (distance == 0)   distance = 0.01;
+
+        densite[zoneY + l][zoneX + k] += cellVivante.taille * attrait / distance;
+      }
+    }
+  }
+}
+
 // Définit la position de la souris
 void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int **densite) {
 
     int i;
     int j;
+    int k;
     float distanceX = 0;
     float distanceY = 0;
     float tailleZoneX = infos->taille * RESOLUTION;
@@ -102,7 +185,9 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     float distance = 1;
     float ratio = 0;
     float bestRatio = 0;
+    infos -> split = 0;
 
+    printf("%d\n", infos -> taille);
     for (i = 0; i < nombreZonesY; i++) {
         for (j = 0; j < nombreZonesX; j++) {
 
@@ -119,13 +204,18 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                 bestRatio = ratio;
                 infos -> sourisX = (int)(tailleZoneX * j + 0.5 * tailleZoneX);
                 infos -> sourisY = (int)(tailleZoneY * i + 0.5 * tailleZoneY);
-            }
 
+                if ((densite[i][j] > 100 * infos -> taille / 3 || SOLO) && infos -> taille > 70) {
+                  for (k = 0; k < 16; k++) {
+                    if (infos -> idCellules[k] == 0) infos -> split = 1;
+                  }
+                }
+            }
         }
     }
 }
 
-
+// Modifie le buffer
 void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
 
   if (infos -> split == 1){
@@ -172,84 +262,9 @@ void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
   }
 }
 
-// Remplis la grille de densité
-void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole) {
-  int j;
-  int zoneX = 0;
-  int zoneY = 0;
-  float distance = 0;
-  float attrait = 0;
-
-  int plusPetit = 999999;
-
-  int k;
-  int l;
-
-  // On selectionne la plus petite de nos cellules
-  for (j = 0; j < 16; j++) {
-
-      // On update la position et la taille
-      if(cellVivante.id == infos->idCellules[j] && cellVivante.taille <= plusPetit) {
-          infos -> taille = cellVivante.taille;
-          infos -> posX = cellVivante.x;
-          infos -> posY = cellVivante.y;
-          plusPetit = infos -> taille;
-      }
-  }
-
-  // Indice de la case centrale du remplissage
-  zoneX = (cellVivante.x) / (infos->taille * RESOLUTION);
-  zoneY = (cellVivante.y) / (infos->taille * RESOLUTION);
-
-  // Gestion de l'attrait de la cellule
-
-  // Si food
-  if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0) {
-    attrait = 1;
-  }
-  // Si virus
-  else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0) {
-      if (infos -> taille > 1.4 * cellVivante.taille) {
-          attrait = 0.8;
-      }
-  }
-  // Si méchant
-  else if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1)
-  {
-    if (infos -> taille > 1.4 * cellVivante.taille) {
-        attrait = 1;
-    }
-    else if (infos -> taille < 1.4 * cellVivante.taille){
-      attrait = -10;
-    }
-    else {
-      attrait = 0;
-    }
-  }
-
-  // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
-  for (k = -tailleAureole; k < tailleAureole; k++) {
-    for (l =  -tailleAureole; l <  tailleAureole; l++) {
-
-      // On évite le segfault...
-      if (zoneX + k < nombreZonesX && zoneY + l < nombreZonesY && zoneX + k >= 0 && zoneY + l >= 0) {
-
-        distance = sqrt(k*k + l*l);
-
-        // Cellule centrale 10 fois plus importante que celles juste autour
-        if (distance == 0)   distance = 0.001;
-
-        densite[zoneY + l][zoneX + k] += cellVivante.taille * attrait / distance;
-      }
-    }
-  }
-}
-
 
 // Fonction principale
 void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
-
-  int cellMort;
 
   // Position
   if (recu[0] == 17) {
@@ -304,6 +319,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
   // MAJ cellules
   else if (recu[0] == 16) {
 
+      int cellMort;
       int i;
       int j;
 
@@ -335,14 +351,14 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
       // Nombre de cellules mortes
       cellMort = valeurPaquet(1, 2, recu);
 
-      // Retirer nos cellules mortes
-      // for (i = 3; i < cellMort * 8 + 3; i += 8) {
-      //     for (j = 0; j < 16; j++) {
-      //         if(valeurPaquet(i, 4, recu) == infos->idCellules[j]) {
-      //             infos->idCellules[j] = 0;
-      //         }
-      //     }
-      // }
+      //Retirer nos cellules mortes
+      for (i = 3; i < cellMort * 8 + 3; i += 8) {
+          for (j = 0; j < 16; j++) {
+              if(valeurPaquet(i+4, 4, recu) == infos->idCellules[j]) {
+                  infos->idCellules[j] = 0;
+              }
+          }
+      }
 
       Cellule cellVivante;
 
