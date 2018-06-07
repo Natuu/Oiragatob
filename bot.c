@@ -128,7 +128,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 
 		// Choisir un nom
 		unsigned char nom[] = {0x00, 'L', 'e', 'c', 'h', 'b', 'o', 't', 0x00};
-		sendCommand(wsi, nom, 11);
+		sendCommand(wsi, nom, 9);
 
 		break;
 
