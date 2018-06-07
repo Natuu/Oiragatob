@@ -11,10 +11,10 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF  100000
+#define DISTANCECOEFF  1000
 #define DENSITECOEFF   1
-#define RESOLUTION     0.4
-#define SOLO           0
+#define RESOLUTION     0.1
+#define SOLO           1
 #define REPULSIONBORDS 50
 
 // Permet de convertir un groupe d'octets en int
@@ -145,7 +145,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
         attrait = 1;
     }
     else if (infos -> plusGrosseTaille < 1.4 * cellVivante.taille){
-      attrait = -10000;
+      attrait = -1000000;
     }
     else {
       attrait = 0;
@@ -240,7 +240,12 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                 infos -> sourisX = (int)(tailleZoneX * j + 0.5 * tailleZoneX);
                 infos -> sourisY = (int)(tailleZoneY * i + 0.5 * tailleZoneY);
 
-                if ((densite[i][j] > 100 * infos -> taille / 3 || SOLO) && infos -> taille > 70) {
+                if (SOLO && infos -> plusGrosseTaille > 70) {
+                  for (k = 0; k < 16; k++) {
+                    if (infos -> idCellules[k] == 0) infos -> split = 1;
+                  }
+                }
+                else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > 70) {
                   for (k = 0; k < 16; k++) {
                     if (infos -> idCellules[k] == 0) infos -> split = 1;
                   }
@@ -422,7 +427,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
         // Remplissage de la grille de densité
         // On hydrate une fois sans virus ni ennemis et une fois avec
-        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 10, 1, !SOLO, 30);
+        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 10, 1, !SOLO, 100);
       }
 
       aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 5);
