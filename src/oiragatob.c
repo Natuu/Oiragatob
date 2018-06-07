@@ -11,10 +11,11 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF 100
-#define DENSITECOEFF  1
-#define RESOLUTION    0.4
-#define SOLO          1
+#define DISTANCECOEFF  100
+#define DENSITECOEFF   1
+#define RESOLUTION     0.4
+#define SOLO           1
+#define REPULSIONBORDS 1
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -169,6 +170,37 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
         if (distance == 0)   distance = 0.01;
 
         densite[zoneY + l][zoneX + k] += cellVivante.taille * attrait / distance;
+      }
+    }
+  }
+}
+
+// Auréole les bords
+void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsion, int tailleAureole) {
+
+  int i;
+  int j;
+  float distance = 0;
+  int k;
+  int l;
+
+  for (i = 0; i < nombreZonesY; i++) {
+    for (j = 0; j < nombreZonesX; j++) {
+
+      if (i == 0 || j == 0 || i == nombreZonesY - 1 || j == nombreZonesX - 1) {
+        // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
+        for (k = -tailleAureole; k < tailleAureole; k++) {
+          for (l =  -tailleAureole; l <  tailleAureole; l++) {
+
+            // On évite le segfault...
+            if (j + k < nombreZonesX && i + l < nombreZonesY && j + k >= 0 && i + l >= 0) {
+              distance = sqrt(k*k + l*l);
+              // Cellule centrale 100 fois plus importante que celles juste autour
+              if (distance == 0)   distance = 0.5;
+              densite[i + l][j + k] += - repulsion / distance;
+            }
+          }
+        }
       }
     }
   }
@@ -391,8 +423,10 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
         // Remplissage de la grille de densité
         // On hydrate une fois sans virus ni ennemis et une fois avec
-        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 10, 1, !SOLO, 1);
+        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 10, 1, !SOLO, 5);
       }
+
+      aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 5);
 
       //
       pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);

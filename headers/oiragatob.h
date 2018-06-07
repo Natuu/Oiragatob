@@ -53,3 +53,5 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 void creerPaquetDeplacement(Buffer *envoi, Infos *infos);
 
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole, int food, int ennemis, int virus);
+
+void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsion, int tailleAureole);
