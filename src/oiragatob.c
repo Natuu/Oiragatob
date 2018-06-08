@@ -286,7 +286,7 @@ void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
     uselessPaquet = malloc(sizeof(unsigned char) * 4);
     paquetValeur(1, 16, idPaquet);
     paquetValeur(4, infos->sourisX, xPaquet);
-    printf("xPaquet %d\n\n",valeurPaquet (0, 4, xPaquet));
+    // printf("xPaquet %d\n\n",valeurPaquet (0, 4, xPaquet));
     paquetValeur(4, infos->sourisY, yPaquet);
     paquetValeur(4, 0, uselessPaquet);
 
@@ -442,10 +442,10 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
         // Remplissage de la grille de densité
         // On hydrate une fois sans virus ni ennemis et une fois avec
-        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 10, 1, !SOLO, 100);
+        hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, 11, 1, !SOLO, SOLO);
       }
 
-      aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 5);
+      aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 12);
 
       // On se dirige ou on se splitte
       pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
