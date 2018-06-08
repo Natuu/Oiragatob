@@ -116,7 +116,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
     // Si virus
     if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
-        if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
+        if (infos -> taille > 1.4 * cellVivante.taille) {
             attrait = 1;
         }
     }
