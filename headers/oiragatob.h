@@ -1,38 +1,38 @@
 typedef struct buffer{
 
-  unsigned char *buf;
-  unsigned int len;
+    unsigned char *buf;
+    unsigned int len;
 
 } Buffer;
 
 typedef struct cellule{
 
-  unsigned int id;
-  int x;
-  int y;
-  unsigned int taille;
-  unsigned int flag;
+    unsigned int id;
+    int x;
+    int y;
+    unsigned int taille;
+    unsigned int flag;
 
 } Cellule;
 
 typedef struct infos{
-  int carteG;
-  int carteD;
-  int carteH;
-  int carteB;
-  unsigned int idCellules[30];
-  int posX;
-  int posY;
-  int taille;
-  int plusPetiteTaille;
-  int plusGrosseTaille;
-  int visibleG;
-  int visibleD;
-  int visibleH;
-  int visibleB;
-  int sourisX;
-  int sourisY;
-  int split;
+    int carteG;
+    int carteD;
+    int carteH;
+    int carteB;
+    Cellule cellules[30];
+    int posX;
+    int posY;
+    int taille;
+    int plusPetiteTaille;
+    int plusGrosseTaille;
+    int visibleG;
+    int visibleD;
+    int visibleH;
+    int visibleB;
+    int sourisX;
+    int sourisY;
+    int split;
 
 } Infos;
 

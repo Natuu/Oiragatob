@@ -57,7 +57,7 @@ int sendCommand(struct lws *wsi,unsigned char *buf,unsigned int len)
 	memcpy(&(tmp->buf)[LWS_PRE],buf,len);
 	tmp->len=len;
 	if (packetList == NULL )
-		packetList=tmp;
+	packetList=tmp;
 	else {
 		while (list && list->next) {
 			list=list->next;
@@ -93,7 +93,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 
 
 	switch (reason) {
-	case LWS_CALLBACK_CLIENT_ESTABLISHED:
+		case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		fprintf(stderr, "ogar: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
 
 		// Initialisation
@@ -115,7 +115,7 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		infos.split = 0;
 
 		for (i = 0; i < 30; i++) {
-			infos.idCellules[i] = 0;
+			infos.cellules[i].id = 0;
 		}
 
 		// Ouvrir la connexion
@@ -132,11 +132,11 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 
 		break;
 
- 	case LWS_CALLBACK_CLIENT_WRITEABLE:
+		case LWS_CALLBACK_CLIENT_WRITEABLE:
 		if (writePacket(wsi) < 0 ) forceExit=1;
 		break;
 
-	case LWS_CALLBACK_CLIENT_RECEIVE:
+		case LWS_CALLBACK_CLIENT_RECEIVE:
 		// we have receive some data, check if it can be written in static allocated buffer (length)
 
 		if (offset + len < MAXLEN ) {
@@ -158,26 +158,26 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 			}
 		} else {	// length is too long... get others but ignore them...
 			offset=MAXLEN;
-		 	if ( lws_is_final_fragment(wsi) ) {
+			if ( lws_is_final_fragment(wsi) ) {
 				offset=0;
 			}
 		}
 		break;
-	case LWS_CALLBACK_CLOSED:
+		case LWS_CALLBACK_CLOSED:
 		lwsl_notice("ogar: LWS_CALLBACK_CLOSED\n");
 		forceExit = 1;
 		break;
-	case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
+		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 		lwsl_err("ogar: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
 		forceExit = 1;
 		break;
 
-	case LWS_CALLBACK_COMPLETED_CLIENT_HTTP:
+		case LWS_CALLBACK_COMPLETED_CLIENT_HTTP:
 		lwsl_err("ogar: LWS_CALLBACK_COMPLETED_CLIENT_HTTP\n");
 		forceExit = 1;
 		break;
 
-	default:
+		default:
 		break;
 	}
 
@@ -199,27 +199,27 @@ int main(int argc, char **argv)
 	memset(&i, 0, sizeof(i));
 
 	if (argc < 2)
-		goto usage;
+	goto usage;
 
 
 	while (n >= 0) {
 		n = getopt(argc, argv, "hsp:P:o:");
 		if (n < 0)
-			continue;
+		continue;
 		switch (n) {
-		case 's':
+			case 's':
 			i.ssl_connection = 2;
 			break;
-		case 'p':
+			case 'p':
 			i.port = atoi(optarg);
 			break;
-		case 'o':
+			case 'o':
 			i.origin = optarg;
 			break;
-		case 'P':
+			case 'P':
 			info.http_proxy_address = optarg;
 			break;
-		case 'h':
+			case 'h':
 			goto usage;
 		}
 	}
@@ -227,17 +227,17 @@ int main(int argc, char **argv)
 	srandom(time(NULL));
 
 	if (optind >= argc)
-		goto usage;
+	goto usage;
 
 	signal(SIGINT, sighandler);
 
 	if (lws_parse_uri(argv[optind], &protocol, &i.address, &i.port, &temp))
-		goto usage;
+	goto usage;
 
 	if (!strcmp(protocol, "http") || !strcmp(protocol, "ws"))
-		i.ssl_connection = 0;
+	i.ssl_connection = 0;
 	if (!strcmp(protocol, "https") || !strcmp(protocol, "wss"))
-		i.ssl_connection = 1;
+	i.ssl_connection = 1;
 
 	i.host = i.address;
 	i.ietf_version_or_minus_one = -1;
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 
 	return 0;
 
-usage:
+	usage:
 	fprintf(stderr, "Usage: ogar-client -h -s -p <port> -P <proxy> -o <origin>  <server address> \n");
 	return 1;
 }
