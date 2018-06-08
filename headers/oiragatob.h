@@ -20,7 +20,7 @@ typedef struct infos{
   int carteD;
   int carteH;
   int carteB;
-  unsigned int idCellules[16];
+  unsigned int idCellules[30];
   int posX;
   int posY;
   int taille;
