@@ -16,6 +16,7 @@
 #define RESOLUTION     0.1
 #define SOLO           1
 #define REPULSIONBORDS 50
+#define DISTANCEVISE   4
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -234,11 +235,14 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
             ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * distance);
 
-            // On selectionne la meilleure cellule
+            // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
             if (ratio > bestRatio) {
                 bestRatio = ratio;
-                infos -> sourisX = (int)(tailleZoneX * j + 0.5 * tailleZoneX);
-                infos -> sourisY = (int)(tailleZoneY * i + 0.5 * tailleZoneY);
+                infos -> sourisX = (int)(posX + DISTANCEVISE * (tailleZoneX * j + 0.5 * tailleZoneX - posX));
+                infos -> sourisY = (int)(posY + DISTANCEVISE * (tailleZoneY * i + 0.5 * tailleZoneY - posY));
+
+                if (infos -> sourisX <= 0) infos -> sourisX = 1;
+                if (infos -> sourisY <= 0) infos -> sourisY = 1;
 
                 if (SOLO && infos -> plusGrosseTaille > 70) {
                   for (k = 0; k < 16; k++) {
@@ -253,6 +257,8 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
             }
         }
     }
+
+    printf("From : %d, %d\nTo   : %d, %d\n",infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
 }
 
 // Modifie le buffer
@@ -432,7 +438,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
       aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 5);
 
-      //
+      // On se dirige ou on se splitte
       pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
 
       for (i = 0; i < nombreZonesY; i++) {
