@@ -15,8 +15,8 @@
 #define DENSITECOEFF   1
 #define RESOLUTION     0.1
 #define SOLO           1
-#define REPULSIONBORDS 50
-#define DISTANCEVISE   4
+#define REPULSIONBORDS 10000
+#define DISTANCEVISE   12
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -104,12 +104,12 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
   int l;
 
   // On selectionne la plus petite de nos cellules
-  for (j = 0; j < 16; j++) {
+  for (j = 0; j < 30; j++) {
 
       // On update la position et la taille
       if(cellVivante.id == infos->idCellules[j]) {
         auBot = 1;
-        // printf("ID: %d Cell : %d  PosX: %d   PosY: %d\n", j, cellVivante.id, cellVivante.x, cellVivante.y);
+        //printf("ID: %d Cell : %d  PosX: %d   PosY: %d\n", j, cellVivante.id, cellVivante.x, cellVivante.y);
 
         if (cellVivante.taille < infos -> plusPetiteTaille) {
           infos -> plusPetiteTaille = cellVivante.taille;
@@ -145,7 +145,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
         attrait = 1;
     }
-    else if (infos -> plusGrosseTaille < 1.4 * cellVivante.taille){
+    else if (infos -> plusGrosseTaille < 1.2 * cellVivante.taille){
       attrait = -1000000;
     }
     else {
@@ -212,7 +212,6 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
     int i;
     int j;
-    int k;
     float distanceX = 0;
     float distanceY = 0;
     float tailleZoneX = infos->taille * RESOLUTION;
@@ -245,14 +244,10 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                 if (infos -> sourisY <= 0) infos -> sourisY = 1;
 
                 if (SOLO && infos -> plusGrosseTaille > 70) {
-                  for (k = 0; k < 16; k++) {
-                    if (infos -> idCellules[k] == 0) infos -> split = 1;
-                  }
+                  infos -> split = 1;
                 }
                 else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > 70) {
-                  for (k = 0; k < 16; k++) {
-                    if (infos -> idCellules[k] == 0) infos -> split = 1;
-                  }
+                  infos -> split = 1;
                 }
             }
         }
@@ -263,9 +258,16 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
 // Modifie le buffer
 void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
+  int i;
+  int nombreCellules = 0;
 
-  if (infos -> split == 1){
+  for (i = 0; i < 30; i++) {
+    if (0 != infos->idCellules[i]) nombreCellules ++;
+  }
+
+  if (infos -> split == 1 && nombreCellules < 16){
     envoi -> len = 1;
+    free(envoi -> buf);
     envoi -> buf = malloc(envoi -> len * sizeof(unsigned char));
     paquetValeur(1, 17, envoi -> buf);
 
@@ -284,10 +286,12 @@ void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
     uselessPaquet = malloc(sizeof(unsigned char) * 4);
     paquetValeur(1, 16, idPaquet);
     paquetValeur(4, infos->sourisX, xPaquet);
+    printf("xPaquet %d\n\n",valeurPaquet (0, 4, xPaquet));
     paquetValeur(4, infos->sourisY, yPaquet);
     paquetValeur(4, 0, uselessPaquet);
 
     //Initialisation du pointeur
+    free(envoi -> buf);
     envoi -> buf = malloc(envoi -> len * sizeof(unsigned char));
 
     unsigned char *paquetIntermediaire1;
@@ -298,6 +302,8 @@ void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
     assemblerPaquets(paquetIntermediaire1, 5, yPaquet, 4, paquetIntermediaire2);
     // Derniers paquets
     assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi -> buf);
+
+
 
     free(idPaquet);
     free(xPaquet);
@@ -327,7 +333,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
       int i;
 
-      for (i = 0; i < 16; i++) {
+      for (i = 0; i < 30; i++) {
         infos->idCellules[i] = 0;
       }
 
@@ -340,11 +346,14 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
     int i = 0;
     int aAjouter = valeurPaquet(1, 4, recu);
 
-    while (infos->idCellules[i] != 0 && i < 16 && infos->idCellules[i] != aAjouter) i++;
+    while (infos->idCellules[i] != 0 && i < 30 && infos->idCellules[i] != aAjouter) i++;
 
     if (infos->idCellules[i] == 0) {
       infos->idCellules[i] = aAjouter;
     }
+    // else {
+    //   printf("Pas d'ajout ??!!?");
+    // }
 
     // printf("Ajout cellule d'ID : %d\n", infos->idCellules[i]);
   }
@@ -403,7 +412,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
       //Retirer nos cellules mortes
       for (i = 3; i < cellMort * 8 + 3; i += 8) {
-          for (j = 0; j < 16; j++) {
+          for (j = 0; j < 30; j++) {
               if(valeurPaquet(i+4, 4, recu) == infos->idCellules[j]) {
                   infos->idCellules[j] = 0;
               }
@@ -416,7 +425,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
       int parcourCell = 3 + cellMort * 8;
 
       // Traitement des cellules une à une
-      while (recu[parcourCell] != 0){
+      while (recu[parcourCell] + recu[parcourCell + 1] + recu[parcourCell + 2] + recu[parcourCell + 3] != 0){
 
         cellVivante.id = valeurPaquet(parcourCell, 4, recu);
         cellVivante.x = valeurPaquet((parcourCell + 4), 4, recu);
@@ -447,6 +456,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
       free(densite);
 
       creerPaquetDeplacement(envoi, infos);
+      // printf("paquet %s\n", envoi);
 
   }
 
