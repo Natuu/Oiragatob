@@ -20,7 +20,7 @@
 #define AUREOLAGE              13
 #define TAILLECOEFF            0.1
 #define TAILLESPLIT            80
-#define NOMBRESPLIT            3
+#define NOMBRESPLIT            2
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.2
 #define MECHANTS               1000
