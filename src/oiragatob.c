@@ -19,7 +19,7 @@
 #define DISTANCEVISE   12
 #define AUREOLAGE      16
 #define TAILLECOEFF    0.1
-#define TAILLESPLIT    200
+#define TAILLESPLIT    160
 
 
 // Permet de convertir un groupe d'octets en int
@@ -256,7 +256,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                         if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT) {
                             infos -> split = 1;
                         }
-                        else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > 70) {
+                        else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > TAILLESPLIT) {
                             infos -> split = 1;
                         }
                     }
