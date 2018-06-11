@@ -11,7 +11,7 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF  10
+#define DISTANCECOEFF  50
 #define DENSITECOEFF   1
 #define RESOLUTION     0.4
 #define SOLO           1
