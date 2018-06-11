@@ -11,14 +11,15 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF  10000
+#define DISTANCECOEFF  100
 #define DENSITECOEFF   1
 #define RESOLUTION     0.4
 #define SOLO           1
-#define REPULSIONBORDS 10000
+#define REPULSIONBORDS 10
 #define DISTANCEVISE   12
-#define AUREOLAGE      15
+#define AUREOLAGE      16
 #define TAILLECOEFF    0.1
+#define TAILLESPLIT    200
 
 
 // Permet de convertir un groupe d'octets en int
@@ -252,7 +253,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                         if (infos -> sourisX <= 0) infos -> sourisX = 1;
                         if (infos -> sourisY <= 0) infos -> sourisY = 1;
 
-                        if (SOLO && infos -> plusGrosseTaille > 70) {
+                        if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT) {
                             infos -> split = 1;
                         }
                         else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > 70) {
@@ -492,7 +493,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
             hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, AUREOLAGE, 1, !SOLO, SOLO);
         }
 
-        aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS * (!SOLO), 12);
+        aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 12);
 
         // On se dirige ou on se splitte
         pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
