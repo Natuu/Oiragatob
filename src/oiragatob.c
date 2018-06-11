@@ -11,16 +11,18 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF  50
-#define DENSITECOEFF   1
-#define RESOLUTION     0.4
-#define SOLO           1
-#define REPULSIONBORDS 20
-#define DISTANCEVISE   12
-#define AUREOLAGE      16
-#define TAILLECOEFF    0.1
-#define TAILLESPLIT    80
-#define NOMBRESPLIT    3
+#define DISTANCECOEFF          50
+#define DENSITECOEFF           1
+#define RESOLUTION             0.4
+#define SOLO                   1
+#define REPULSIONBORDS         20
+#define DISTANCEVISE           12
+#define AUREOLAGE              16
+#define TAILLECOEFF            0.1
+#define TAILLESPLIT            80
+#define NOMBRESPLIT            3
+#define INTENSITEAUREOLE       0.1
+#define INTENSITEAUREOLEBORDS  0.1
 
 
 // Permet de convertir un groupe d'octets en int
@@ -157,7 +159,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
                 distance = sqrt(k*k + l*l);
 
                 // Cellule centrale 100 fois plus importante que celles juste autour
-                if (distance == 0)   distance = 0.01;
+                if (distance == 0)   distance = INTENSITEAUREOLE;
 
                 densite[zoneY + l][zoneX + k] += cellVivante.taille * attrait / distance;
             }
@@ -186,7 +188,7 @@ void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsi
                         if (j + k < nombreZonesX && i + l < nombreZonesY && j + k >= 0 && i + l >= 0) {
                             distance = sqrt(k*k + l*l);
                             // Cellule centrale 100 fois plus importante que celles juste autour
-                            if (distance == 0)   distance = 0.5;
+                            if (distance == 0)   distance = INTENSITEAUREOLEBORDS;
                             densite[i + l][j + k] += - repulsion / distance;
                         }
                     }
