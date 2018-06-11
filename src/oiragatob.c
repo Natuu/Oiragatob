@@ -15,7 +15,7 @@
 #define DENSITECOEFF   1
 #define RESOLUTION     0.4
 #define SOLO           1
-#define REPULSIONBORDS 100
+#define REPULSIONBORDS 20
 #define DISTANCEVISE   12
 #define AUREOLAGE      16
 #define TAILLECOEFF    0.1
