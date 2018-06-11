@@ -13,7 +13,7 @@
 // Fine tuning
 #define DISTANCECOEFF          40
 #define DENSITECOEFF           1
-#define RESOLUTION             0.35
+#define RESOLUTION             0.3
 #define SOLO                   1
 #define REPULSIONBORDS         20
 #define DISTANCEVISE           12
