@@ -33,6 +33,9 @@ typedef struct infos{
     int sourisX;
     int sourisY;
     int split;
+    int viserX[9];
+    int viserY[9];
+    int atteintViser;
 
 } Infos;
 

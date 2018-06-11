@@ -113,9 +113,15 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 		infos.sourisX = 0;
 		infos.sourisY = 0;
 		infos.split = 0;
+		infos.atteintViser = 0;
 
 		for (i = 0; i < 30; i++) {
 			infos.cellules[i].id = 0;
+		}
+
+		for (i = 0; i < 9; i++) {
+			infos.viserX[i] = 0;
+			infos.viserX[i] = 0;
 		}
 
 		// Ouvrir la connexion

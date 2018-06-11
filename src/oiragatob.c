@@ -240,7 +240,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                     ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * distance * infos -> cellules[k].taille * TAILLECOEFF);
 
                     // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
-                    if (ratio > bestRatio) {
+                    if (ratio >= bestRatio) {
                         bestRatio = ratio;
                         infos -> taille = infos -> cellules[k].taille;
                         infos -> posX = infos -> cellules[k].x;
@@ -262,6 +262,16 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                 }
             }
         }
+    }
+
+    if (bestRatio == 0) {
+        if ((infos -> posX >= infos -> viserX[infos -> atteintViser] - 500 && infos -> posX <= infos -> viserX[infos -> atteintViser] + 500) && (infos -> posY >= infos -> viserY[infos -> atteintViser] - 500 && infos -> posY <= infos -> viserY[infos -> atteintViser] + 500))
+        {
+            infos -> atteintViser ++;
+            infos -> atteintViser %= 9;
+        }
+        infos -> sourisX = infos -> viserX[infos -> atteintViser];
+        infos -> sourisY = infos -> viserY[infos -> atteintViser];
     }
 
     // printf("From : %d, %d\nTo   : %d, %d\n",infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
@@ -381,6 +391,34 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
         if(infos->carteD < infos->visibleD) infos->carteD = infos->visibleD;
         if(infos->carteB < infos->visibleB) infos->carteB = infos->visibleB;
 
+        // On set les points interessants en cas de vide sur la map
+        infos -> viserX[0] = 200;
+        infos -> viserY[0] = 200;
+
+        infos -> viserX[1] = 200;
+        infos -> viserY[1] = infos->carteB - 200;
+
+        infos -> viserX[2] = infos->carteD - 200;
+        infos -> viserY[2] = infos->carteB - 200;
+
+        infos -> viserX[3] = infos->carteD - 200;
+        infos -> viserY[3] = 200;
+
+        infos -> viserX[4] = 200;
+        infos -> viserY[4] = infos->carteB / 2;
+
+        infos -> viserX[5] = infos->carteD / 2;
+        infos -> viserY[5] = infos->carteB - 200;
+
+        infos -> viserX[6] = infos->carteD - 200;
+        infos -> viserY[6] = infos->carteB / 2;
+
+        infos -> viserX[7] = infos->carteD / 2;
+        infos -> viserY[7] = 200;
+
+        infos -> viserX[8] = infos->carteD / 2;
+        infos -> viserY[8] = infos->carteB / 2;
+
         // printf("Bord gauche  : %d\nBord droit   : %d\nBord haut    : %d\nBord bas     : %d\n", infos->visibleG, infos->visibleD, infos->visibleH, infos->visibleB);
     }
 
@@ -454,7 +492,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
             hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, AUREOLAGE, 1, !SOLO, SOLO);
         }
 
-        aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 12);
+        aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS * (!SOLO), 12);
 
         // On se dirige ou on se splitte
         pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
