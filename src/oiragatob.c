@@ -11,13 +11,13 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF          50
+#define DISTANCECOEFF          40
 #define DENSITECOEFF           1
 #define RESOLUTION             0.35
 #define SOLO                   1
 #define REPULSIONBORDS         20
 #define DISTANCEVISE           12
-#define AUREOLAGE              16
+#define AUREOLAGE              13
 #define TAILLECOEFF            0.1
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            3
