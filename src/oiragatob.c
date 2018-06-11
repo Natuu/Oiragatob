@@ -24,6 +24,7 @@
 #define INTENSITEAUREOLE       0.005
 #define INTENSITEAUREOLEBORDS  0.1
 #define MECHANTS               1000
+#define RATIOSPLITMULTI        1
 
 
 // Permet de convertir un groupe d'octets en int
@@ -136,7 +137,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1 && ennemis)
     {
         if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
-            attrait = 1;
+            attrait = MECHANTS;
         }
         else if (infos -> plusGrosseTaille < 1.2 * cellVivante.taille){
             attrait = -MECHANTS;
@@ -283,7 +284,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
-    else if (bestDensite > 100 * infos -> taille / 3 && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+    else if (bestDensite > 100 * infos -> taille * RATIOSPLIT && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
 
