@@ -21,8 +21,8 @@
 #define TAILLECOEFF            0.1
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            3
-#define INTENSITEAUREOLE       0.1
-#define INTENSITEAUREOLEBORDS  0.1
+#define INTENSITEAUREOLE       0.08
+#define INTENSITEAUREOLEBORDS  0.2
 
 
 // Permet de convertir un groupe d'octets en int
