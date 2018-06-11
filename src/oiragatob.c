@@ -19,7 +19,7 @@
 #define DISTANCEVISE   12
 #define AUREOLAGE      16
 #define TAILLECOEFF    0.1
-#define TAILLESPLIT    100
+#define TAILLESPLIT    80
 #define NOMBRESPLIT    3
 
 
