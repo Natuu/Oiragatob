@@ -13,7 +13,7 @@
 // Fine tuning
 #define DISTANCECOEFF          50
 #define DENSITECOEFF           1
-#define RESOLUTION             0.4
+#define RESOLUTION             0.35
 #define SOLO                   1
 #define REPULSIONBORDS         20
 #define DISTANCEVISE           12
@@ -23,6 +23,7 @@
 #define NOMBRESPLIT            3
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.2
+#define MECHANTS               1000
 
 
 // Permet de convertir un groupe d'octets en int
@@ -101,8 +102,10 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
 // Remplis la grille de densité
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole, int food, int ennemis, int virus) {
     int i;
+    int j;
     int zoneX = 0;
     int zoneY = 0;
+    int nbCases = 1;
     float distance = 0;
     float attrait = 0;
     int k;
@@ -111,6 +114,9 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Indice de la case centrale du remplissage
     zoneX = (cellVivante.x) / (infos->plusPetiteTaille * RESOLUTION);
     zoneY = (cellVivante.y) / (infos->plusPetiteTaille * RESOLUTION);
+
+    // Nombre de cases occupées par la cellule
+    nbCases = cellVivante.taille / ((infos->plusPetiteTaille * RESOLUTION) * 2);
 
     // Gestion de l'attrait de la cellule
 
@@ -131,7 +137,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
             attrait = 1;
         }
         else if (infos -> plusGrosseTaille < 1.2 * cellVivante.taille){
-            attrait = -1000000;
+            attrait = -MECHANTS;
         }
         else {
             attrait = 0;
@@ -149,19 +155,25 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
         }
     }
 
-    // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
-    for (k = -tailleAureole; k < tailleAureole; k++) {
-        for (l =  -tailleAureole; l <  tailleAureole; l++) {
+    // Pour chaque zones qu'occupe la cellule
+    for (i = -nbCases; i < nbCases; i++) {
+        for (j = -nbCases; j < nbCases; j++) {
 
-            // On évite le segfault...
-            if (zoneX + k < nombreZonesX && zoneY + l < nombreZonesY && zoneX + k >= 0 && zoneY + l >= 0) {
+            // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
+            for (k = -tailleAureole; k < tailleAureole; k++) {
+                for (l =  -tailleAureole; l <  tailleAureole; l++) {
 
-                distance = sqrt(k*k + l*l);
+                    // On évite le segfault...
+                    if (zoneX + i + k < nombreZonesX && zoneY + j + l < nombreZonesY && zoneX + i + k >= 0 && zoneY + j + l >= 0) {
 
-                // Cellule centrale 100 fois plus importante que celles juste autour
-                if (distance == 0)   distance = INTENSITEAUREOLE;
+                        distance = sqrt(k*k + l*l);
 
-                densite[zoneY + l][zoneX + k] += cellVivante.taille * attrait / distance;
+                        // Cellule centrale 100 fois plus importante que celles juste autour
+                        if (distance == 0)   distance = INTENSITEAUREOLE;
+
+                        densite[zoneY + j + l][zoneX + i  + k] += cellVivante.taille * attrait / distance;
+                    }
+                }
             }
         }
     }
@@ -344,7 +356,6 @@ void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
     }
 
 }
-
 
 // Fonction principale
 void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
