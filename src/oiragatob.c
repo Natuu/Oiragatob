@@ -19,7 +19,8 @@
 #define DISTANCEVISE   12
 #define AUREOLAGE      16
 #define TAILLECOEFF    0.1
-#define TAILLESPLIT    180
+#define TAILLESPLIT    100
+#define NOMBRESPLIT    3
 
 
 // Permet de convertir un groupe d'octets en int
@@ -213,11 +214,14 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     infos -> split = 0;
     infos -> plusGrosseTaille = 0;
     infos -> plusPetiteTaille = 999999;
+    int nombreSplit = 0;
 
     for (k = 0; k < 30; k++) {
 
         // Si on pilote la cellule
         if (infos -> cellules[k].id != 0) {
+
+            nombreSplit ++;
 
             posX = infos -> cellules[k].x;
             posY = infos -> cellules[k].y;
@@ -253,10 +257,10 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                         if (infos -> sourisX <= 0) infos -> sourisX = 1;
                         if (infos -> sourisY <= 0) infos -> sourisY = 1;
 
-                        if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT) {
+                        if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
                             infos -> split = 1;
                         }
-                        else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > TAILLESPLIT) {
+                        else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
                             infos -> split = 1;
                         }
                     }
