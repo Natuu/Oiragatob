@@ -493,7 +493,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
             hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, AUREOLAGE, 1, !SOLO, SOLO);
         }
 
-        aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, 12);
+        aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, AUREOLAGE);
 
         // On se dirige ou on se splitte
         pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
