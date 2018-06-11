@@ -17,11 +17,11 @@
 #define SOLO                   1
 #define REPULSIONBORDS         20
 #define DISTANCEVISE           12
-#define AUREOLAGE              13
+#define AUREOLAGE              18
 #define TAILLECOEFF            0.1
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            2
-#define INTENSITEAUREOLE       0.05
+#define INTENSITEAUREOLE       0.025
 #define INTENSITEAUREOLEBORDS  0.2
 #define MECHANTS               1000
 
