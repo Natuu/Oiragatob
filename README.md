@@ -13,6 +13,12 @@ Lancer avec
 ./bot -o agar.io 127.0.0.1:1443
 ```
 
+ou adapter et lancer
+
+```
+./run.sh
+```
+
 ## Fonctionnement
 ### Création
 Lorsque le client est connecté au serveur, le bot envoie un paquet avec son nom.
