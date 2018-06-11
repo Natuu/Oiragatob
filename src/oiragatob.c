@@ -118,6 +118,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Nombre de cases occupées par la cellule
     nbCases = cellVivante.taille / ((infos->plusPetiteTaille * RESOLUTION) * 2);
 
+    if (nbCases == 0) nbCases = 1;
+
     // Gestion de l'attrait de la cellule
 
     // Si food
