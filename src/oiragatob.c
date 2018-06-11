@@ -21,7 +21,7 @@
 #define TAILLECOEFF            0.1
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            3
-#define INTENSITEAUREOLE       0.08
+#define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.2
 
 
