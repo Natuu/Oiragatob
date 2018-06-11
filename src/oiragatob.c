@@ -215,6 +215,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     infos -> plusGrosseTaille = 0;
     infos -> plusPetiteTaille = 999999;
     int nombreSplit = 0;
+    int bestDensite = 0;
 
     for (k = 0; k < 30; k++) {
 
@@ -247,6 +248,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                     // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
                     if (ratio >= bestRatio) {
                         bestRatio = ratio;
+                        bestDensite = densite[i][j];
                         infos -> taille = infos -> cellules[k].taille;
                         infos -> posX = infos -> cellules[k].x;
                         infos -> posY = infos -> cellules[k].y;
@@ -256,17 +258,17 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
                         if (infos -> sourisX <= 0) infos -> sourisX = 1;
                         if (infos -> sourisY <= 0) infos -> sourisY = 1;
-
-                        if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
-                            infos -> split = 1;
-                        }
-                        else if (densite[i][j] > 100 * infos -> taille / 3 && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
-                            infos -> split = 1;
-                        }
                     }
                 }
             }
         }
+    }
+
+    if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+        infos -> split = 1;
+    }
+    else if (bestDensite > 100 * infos -> taille / 3 && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+        infos -> split = 1;
     }
 
     if (bestRatio == 0) {
