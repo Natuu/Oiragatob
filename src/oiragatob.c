@@ -19,7 +19,7 @@
 #define DISTANCEVISE   12
 #define AUREOLAGE      16
 #define TAILLECOEFF    0.1
-#define TAILLESPLIT    160
+#define TAILLESPLIT    180
 
 
 // Permet de convertir un groupe d'octets en int
