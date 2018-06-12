@@ -30,7 +30,13 @@
 
 // Donne la masse en fonction de la taille
 int masse(int taille){
-    return (taille * taille /100);
+    if (taille > 0) {
+        return (taille * taille /100);
+    }
+    else {
+        return (-taille * taille /100);
+    }
+
 }
 
 // Permet de convertir un groupe d'octets en int
@@ -207,7 +213,7 @@ void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsi
                             distance = sqrt(k*k + l*l);
                             // Cellule centrale 100 fois plus importante que celles juste autour
                             if (distance == 0)   distance = INTENSITEAUREOLEBORDS;
-                            densite[i + l][j + k] += - repulsion / distance;
+                            densite[i + l][j + k] +=  -repulsion / distance;
                         }
                     }
                 }
