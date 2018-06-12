@@ -11,18 +11,18 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF          200
+#define DISTANCECOEFF          500
 #define DENSITECOEFF           1
 #define RESOLUTION             0.3
 #define SOLO                   1
-#define REPULSIONBORDS         50
+#define REPULSIONBORDS         10
 #define DISTANCEVISE           12
 #define AUREOLAGE              10
 #define TAILLECOEFF            0.1
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            1
-#define INTENSITEAUREOLE       0.005
-#define INTENSITEAUREOLEBORDS  0.05
+#define INTENSITEAUREOLE       0.05
+#define INTENSITEAUREOLEBORDS  0.1
 #define MECHANTS               2000
 #define GENTILS                100
 #define RATIOSPLITMULTI        0.05
@@ -136,7 +136,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Si virus
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
         if (masse(infos -> taille) > 1.31 * masse(cellVivante.taille)) {
-            attrait = 1;
+            attrait = 10;
         }
     }
     // Si méchant
@@ -263,7 +263,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
                     if (distance == 0) distance = 1;
 
-                    ratio = (DENSITECOEFF * (float)densite[i][j]) / (DISTANCECOEFF * distance * infos -> cellules[k].taille * TAILLECOEFF);
+                    ratio = (DENSITECOEFF * (float)masse(densite[i][j])) / ((DISTANCECOEFF * distance) + (masse(infos -> cellules[k].taille) * TAILLECOEFF));
 
                     // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
                     if (ratio >= bestRatio) {
@@ -306,7 +306,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 }
 
 // Modifie le buffer
-void creerPaquetDeplacement(Buffer *envoi, Infos *infos){
+void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
     int i;
     int nombreCellules = 0;
 
