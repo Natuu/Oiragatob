@@ -22,10 +22,16 @@
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            3
 #define INTENSITEAUREOLE       0.005
+<<<<<<< HEAD
 #define INTENSITEAUREOLEBORDS  0.5
 #define MECHANTS               2000
 #define GENTILS                100
 #define RATIOSPLITMULTI        0.05
+=======
+#define INTENSITEAUREOLEBORDS  0.05
+#define MECHANTS               1000
+#define RATIOSPLITMULTI        0.3
+>>>>>>> c0d2d37760a5703e842c2065763e9b878c94e4b5
 
 
 // Donne la masse en fonction de la taille
@@ -142,8 +148,16 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Si méchant
     else if (ennemis)
     {
+<<<<<<< HEAD
         if (masse(infos -> plusPetiteTaille) > 1.31 * masse(cellVivante.taille)) {
             attrait = GENTILS;
+=======
+        if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
+            attrait = 1;
+        }
+        else if (infos -> plusGrosseTaille < 1.2 * cellVivante.taille){
+            attrait = -MECHANTS;
+>>>>>>> c0d2d37760a5703e842c2065763e9b878c94e4b5
         }
         else {
             attrait = -MECHANTS;
@@ -287,7 +301,12 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
+<<<<<<< HEAD
     else if (masse(bestDensite * INTENSITEAUREOLE) > masse(infos -> taille) * RATIOSPLITMULTI * GENTILS && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+=======
+    // Rappel : Masse  = Taille * Taille / 100
+    else if ((bestDensite * bestDensite * INTENSITEAUREOLE * INTENSITEAUREOLE / 100) > (infos -> taille * infos -> taille / 100) * RATIOSPLITMULTI && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+>>>>>>> c0d2d37760a5703e842c2065763e9b878c94e4b5
         infos -> split = 1;
     }
 
