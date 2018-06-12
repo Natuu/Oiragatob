@@ -18,7 +18,7 @@
 #define REPULSIONBORDS         50
 #define DISTANCEVISE           12
 #define AUREOLAGE              10
-#define TAILLECOEFF            0.2
+#define TAILLECOEFF            0.1
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            1
 #define INTENSITEAUREOLE       0.005
@@ -135,7 +135,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
     // Si virus
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
-        if (infos -> taille > 1.4 * cellVivante.taille) {
+        if (masse(infos -> taille) > 1.31 * masse(cellVivante.taille)) {
             attrait = 1;
         }
     }
