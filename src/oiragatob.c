@@ -22,7 +22,7 @@
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            1
 #define INTENSITEAUREOLE       0.05
-#define INTENSITEAUREOLEBORDS  0.1
+#define INTENSITEAUREOLEBORDS  0.5
 #define MECHANTS               2000
 #define GENTILS                100
 #define RATIOSPLITMULTI        0.05
@@ -213,7 +213,7 @@ void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsi
                             distance = sqrt(k*k + l*l);
                             // Cellule centrale 100 fois plus importante que celles juste autour
                             if (distance == 0)   distance = INTENSITEAUREOLEBORDS;
-                            densite[i + l][j + k] += - repulsion / distance;
+                            densite[i + l][j + k] -= repulsion / distance;
                         }
                     }
                 }
