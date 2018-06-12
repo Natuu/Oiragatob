@@ -213,7 +213,7 @@ void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsi
                             distance = sqrt(k*k + l*l);
                             // Cellule centrale 100 fois plus importante que celles juste autour
                             if (distance == 0)   distance = INTENSITEAUREOLEBORDS;
-                            densite[i + l][j + k] +=  -repulsion / distance;
+                            densite[i + l][j + k] += - repulsion / distance;
                         }
                     }
                 }
