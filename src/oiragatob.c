@@ -284,7 +284,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
-    else if (bestDensite > 100 * infos -> taille * RATIOSPLIT && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+    else if (bestDensite > 100 * infos -> taille * RATIOSPLITMULTI && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
 
