@@ -14,18 +14,24 @@
 #define DISTANCECOEFF          200
 #define DENSITECOEFF           1
 #define RESOLUTION             0.3
-#define SOLO                   1
-#define REPULSIONBORDS         20
+#define SOLO                   0
+#define REPULSIONBORDS         50
 #define DISTANCEVISE           12
 #define AUREOLAGE              10
 #define TAILLECOEFF            0.2
 #define TAILLESPLIT            80
 #define NOMBRESPLIT            3
 #define INTENSITEAUREOLE       0.005
-#define INTENSITEAUREOLEBORDS  0.1
-#define MECHANTS               1000
-#define RATIOSPLITMULTI        1
+#define INTENSITEAUREOLEBORDS  0.5
+#define MECHANTS               2000
+#define GENTILS                100
+#define RATIOSPLITMULTI        0.05
 
+
+// Donne la masse en fonction de la taille
+int masse(int taille){
+    return (taille * taille /100);
+}
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -128,22 +134,19 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
         attrait = 1;
     }
     // Si virus
-    if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
+    else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
         if (infos -> taille > 1.4 * cellVivante.taille) {
             attrait = 1;
         }
     }
     // Si méchant
-    if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 1 && ennemis)
+    else if (ennemis)
     {
-        if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
-            attrait = MECHANTS;
-        }
-        else if (infos -> plusGrosseTaille < 1.2 * cellVivante.taille){
-            attrait = -MECHANTS;
+        if (masse(infos -> plusPetiteTaille) > 1.31 * masse(cellVivante.taille)) {
+            attrait = GENTILS;
         }
         else {
-            attrait = 0;
+            attrait = -MECHANTS;
         }
     }
 
@@ -284,10 +287,11 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
-    else if (bestDensite > 100 * infos -> taille * RATIOSPLITMULTI && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+    else if (masse(bestDensite * INTENSITEAUREOLE) > masse(infos -> taille) * RATIOSPLITMULTI * GENTILS && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
 
+    // Si environnement vide, on va ailleurs
     if (bestRatio == 0) {
         if ((infos -> posX >= infos -> viserX[infos -> atteintViser] - 500 && infos -> posX <= infos -> viserX[infos -> atteintViser] + 500) && (infos -> posY >= infos -> viserY[infos -> atteintViser] - 500 && infos -> posY <= infos -> viserY[infos -> atteintViser] + 500))
         {

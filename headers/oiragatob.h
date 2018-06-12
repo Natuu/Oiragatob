@@ -39,6 +39,8 @@ typedef struct infos{
 
 } Infos;
 
+int masse(int taille);
+
 void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos);
 
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet);
