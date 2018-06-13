@@ -266,9 +266,15 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                     distanceY = (tailleZoneY * i + 0.5 * tailleZoneY) - posY;
                     distance = sqrt((distanceX * distanceX) + (distanceY * distanceY));
 
-                    if (distance == 0) distance = 1;
+                    if (distance != 0)
+					{
+						ratio = (DENSITECOEFF * (float)masse(densite[i][j])) / ((DISTANCECOEFF * distance) + (masse(infos -> cellules[k].taille) * TAILLECOEFF));
+					}
+					else {
+						ratio = 0;
+					}
 
-                    ratio = (DENSITECOEFF * (float)masse(densite[i][j])) / ((DISTANCECOEFF * distance) + (masse(infos -> cellules[k].taille) * TAILLECOEFF));
+
 
                     // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
                     if (ratio > bestRatio) {
