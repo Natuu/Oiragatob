@@ -11,16 +11,16 @@
 #include "../headers/oiragatob.h"
 
 // Fine tuning
-#define DISTANCECOEFF          500
+#define DISTANCECOEFF          700
 #define DENSITECOEFF           1
-#define RESOLUTION             0.3
+#define RESOLUTION             0.4
 #define SOLO                   1
-#define REPULSIONBORDS         10
+#define REPULSIONBORDS         8
 #define DISTANCEVISE           12
 #define AUREOLAGE              10
-#define TAILLECOEFF            0.1
+#define TAILLECOEFF            1000
 #define TAILLESPLIT            80
-#define NOMBRESPLIT            1
+#define NOMBRESPLIT            3
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.5
 #define MECHANTS               2000
@@ -118,7 +118,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     int j;
     int zoneX = 0;
     int zoneY = 0;
-    int nbCases = 1;
+    int nbCases = 0;
     float distance = 0;
     float attrait = 0;
     int k;
@@ -127,9 +127,6 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Indice de la case centrale du remplissage
     zoneX = (cellVivante.x) / (infos->plusPetiteTaille * RESOLUTION);
     zoneY = (cellVivante.y) / (infos->plusPetiteTaille * RESOLUTION);
-
-    // Nombre de cases occupées par la cellule
-    nbCases = cellVivante.taille / ((infos->plusPetiteTaille * RESOLUTION) * 2);
 
     if (nbCases == 0) nbCases = 1;
 
@@ -142,7 +139,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Si virus
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
         if (masse(infos -> taille) > 1.31 * masse(cellVivante.taille)) {
-            attrait = 10;
+            attrait = 1;
         }
     }
     // Si méchant
@@ -152,6 +149,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
             attrait = GENTILS;
         }
         else {
+            // Nombre de cases occupées par la cellule
+            nbCases = cellVivante.taille / ((infos->plusPetiteTaille * RESOLUTION) * 2) - 1;
             attrait = -MECHANTS;
         }
     }
@@ -168,8 +167,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
 
     // Pour chaque zones qu'occupe la cellule
-    for (i = -nbCases; i < nbCases; i++) {
-        for (j = -nbCases; j < nbCases; j++) {
+    for (i = -nbCases; i <= nbCases; i++) {
+        for (j = -nbCases; j <= nbCases; j++) {
 
             // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
             for (k = -tailleAureole; k < tailleAureole; k++) {
@@ -235,7 +234,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     float posX;
     float posY;
     float distance = 1;
-    float ratio = 0;
+    float ratio = -1;
     float bestRatio = 0;
     infos -> split = 0;
     infos -> plusGrosseTaille = 0;
@@ -272,7 +271,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                     ratio = (DENSITECOEFF * (float)masse(densite[i][j])) / ((DISTANCECOEFF * distance) + (masse(infos -> cellules[k].taille) * TAILLECOEFF));
 
                     // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
-                    if (ratio >= bestRatio) {
+                    if (ratio > bestRatio) {
                         bestRatio = ratio;
                         bestDensite = densite[i][j];
                         infos -> taille = infos -> cellules[k].taille;
@@ -284,16 +283,20 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
                         if (infos -> sourisX <= 0) infos -> sourisX = 1;
                         if (infos -> sourisY <= 0) infos -> sourisY = 1;
+                        if (infos -> sourisX >= infos -> carteD) infos -> sourisX = infos -> carteD;
+                        if (infos -> sourisY >= infos -> carteB) infos -> sourisY = infos -> carteB;
                     }
                 }
             }
         }
     }
 
+    printf("bestRatio: %f\n",bestRatio);
+
     if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
-    else if (masse(bestDensite * INTENSITEAUREOLE) > masse(infos -> taille) * RATIOSPLITMULTI * GENTILS && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+    else if (!SOLO && masse(bestDensite * INTENSITEAUREOLE) > masse(infos -> taille) * RATIOSPLITMULTI * GENTILS && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
 
@@ -308,7 +311,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
         infos -> sourisY = infos -> viserY[infos -> atteintViser];
     }
 
-    // printf("From : %d, %d\nTo   : %d, %d\n",infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
+    printf("From : %d, %d\nTo   : %d, %d\n",infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
 }
 
 // Modifie le buffer
@@ -357,7 +360,7 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
         // Derniers paquets
         assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi -> buf);
 
-        // printf("xPaquet %d yPaquet %d\n\n",valeurPaquet (1, 4, envoi -> buf), valeurPaquet (5, 4, envoi -> buf));
+        printf("xPaquet %d yPaquet %d\n\n",valeurPaquet (1, 4, envoi -> buf), valeurPaquet (5, 4, envoi -> buf));
 
 
         free(idPaquet);
