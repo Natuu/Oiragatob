@@ -14,7 +14,7 @@
 #define DISTANCECOEFF          700
 #define DENSITECOEFF           1
 #define RESOLUTION             0.4
-#define SOLO                   1
+#define SOLO                   0
 #define REPULSIONBORDS         8
 #define DISTANCEVISE           12
 #define AUREOLAGE              10
@@ -25,19 +25,7 @@
 #define INTENSITEAUREOLEBORDS  0.5
 #define MECHANTS               2000
 #define GENTILS                100
-#define RATIOSPLITMULTI        0.05
-
-
-// Donne la masse en fonction de la taille
-int masse(int taille){
-    if (taille > 0) {
-        return (taille * taille /100);
-    }
-    else {
-        return (-taille * taille /100);
-    }
-
-}
+#define RATIOSPLITMULTI        1.3
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -128,24 +116,28 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     zoneX = (cellVivante.x) / (infos->plusPetiteTaille * RESOLUTION);
     zoneY = (cellVivante.y) / (infos->plusPetiteTaille * RESOLUTION);
 
-    if (nbCases == 0) nbCases = 1;
-
     // Gestion de l'attrait de la cellule
 
     // Si food
     if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0 && food) {
         attrait = 1;
     }
+    // Si virus mais ignorer les vius
+    else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && !virus) {
+        if (infos -> taille > 1.4 * cellVivante.taille) {
+            attrait = -1;
+        }
+    }
     // Si virus
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
-        if (masse(infos -> taille) > 1.31 * masse(cellVivante.taille)) {
+        if (infos -> taille > 1.4 * cellVivante.taille) {
             attrait = 1;
         }
     }
     // Si méchant
     else if (ennemis)
     {
-        if (masse(infos -> plusPetiteTaille) > 1.31 * masse(cellVivante.taille)) {
+        if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
             attrait = GENTILS;
         }
         else {
@@ -234,8 +226,8 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     float posX;
     float posY;
     float distance = 1;
-    float ratio = -1;
-    float bestRatio = 0;
+    float ratio = -9999999999999;
+    float bestRatio = -999999999999;
     infos -> split = 0;
     infos -> plusGrosseTaille = 0;
     infos -> plusPetiteTaille = 999999;
@@ -266,15 +258,12 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                     distanceY = (tailleZoneY * i + 0.5 * tailleZoneY) - posY;
                     distance = sqrt((distanceX * distanceX) + (distanceY * distanceY));
 
-                    if (distance != 0)
-					{
-						ratio = (DENSITECOEFF * (float)masse(densite[i][j])) / ((DISTANCECOEFF * distance) + (masse(infos -> cellules[k].taille) * TAILLECOEFF));
-					}
-					else {
-						ratio = 0;
-					}
-
-
+                    if (distance != 0) {
+    					ratio = densite[i][j] / ((DISTANCECOEFF * distance) + (infos -> cellules[k].taille * TAILLECOEFF));
+    				}
+    				else {
+    					ratio = 0;
+    				}
 
                     // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
                     if (ratio > bestRatio) {
@@ -297,12 +286,12 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
         }
     }
 
-    printf("bestRatio: %f\n",bestRatio);
+    printf("bestRatio: %d\n",bestDensite);
 
     if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
-    else if (!SOLO && masse(bestDensite * INTENSITEAUREOLE) > masse(infos -> taille) * RATIOSPLITMULTI * GENTILS && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+    else if (!SOLO && bestDensite * INTENSITEAUREOLE > infos -> taille * RATIOSPLITMULTI * GENTILS && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
 
