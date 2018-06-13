@@ -286,8 +286,6 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
         }
     }
 
-    printf("bestRatio: %d\n",bestDensite);
-
     if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
         infos -> split = 1;
     }
@@ -306,7 +304,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
         infos -> sourisY = infos -> viserY[infos -> atteintViser];
     }
 
-    printf("From : %d, %d\nTo   : %d, %d\n",infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
+    //printf("From : %d, %d\nTo   : %d, %d\n",infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
 }
 
 // Modifie le buffer
@@ -355,7 +353,7 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
         // Derniers paquets
         assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi -> buf);
 
-        printf("xPaquet %d yPaquet %d\n\n",valeurPaquet (1, 4, envoi -> buf), valeurPaquet (5, 4, envoi -> buf));
+        //printf("xPaquet %d yPaquet %d\n\n",valeurPaquet (1, 4, envoi -> buf), valeurPaquet (5, 4, envoi -> buf));
 
 
         free(idPaquet);
