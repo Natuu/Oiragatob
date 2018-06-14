@@ -7,9 +7,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <math.h>
+#include <SDL2/SDL.h>
 
 #include "headers/client.h"
 #include "headers/oiragatob.h"
+#include "headers/sdlFonctions.h"
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
 // call with: ./bot -o agar.io 127.0.0.1:1443
@@ -193,6 +195,13 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 /****************************************************************************************************************************/
 int main(int argc, char **argv)
 {
+	SDL_Window *window = NULL;
+    SDL_Renderer *renderer = NULL;
+    SDL_Color blanc = {255, 255, 255, 255};
+    if(0 != init(&window, &renderer, 640, 480)) goto Quit;
+    SDL_RenderPresent(renderer);
+
+
 	int n = 0;
 
 	struct lws_context_creation_info info;
@@ -270,6 +279,12 @@ int main(int argc, char **argv)
 	while (!forceExit) {
 		lws_service(context, 1000);
 	}
+
+Quit:
+	if(NULL != renderer) SDL_DestroyRenderer(renderer);
+	if(NULL != window) SDL_DestroyWindow(window);
+	SDL_Quit();
+
 	// if there is some errors, we just quit
 	lwsl_err("Exiting\n");
 	lws_context_destroy(context);

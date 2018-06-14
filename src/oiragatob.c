@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <math.h>
+#include <SDL2/SDL.h>
 
 #include "../headers/oiragatob.h"
 
