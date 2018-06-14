@@ -8,8 +8,8 @@
 #include <unistd.h>
 #include <math.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
-#include "../headers/oiragatob.h"
 #include "../headers/sdlFonctions.h"
 
 
@@ -20,10 +20,12 @@ int init(SDL_Window **window, SDL_Renderer **renderer, int w, int h)
         fprintf(stderr, "Erreur SDL_Init : %s", SDL_GetError());
         return -1;
     }
-    if(0 != SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE, window, renderer))
+
+    if(0 != SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE , window, renderer))
     {
         fprintf(stderr, "Erreur SDL_CreateWindowAndRenderer : %s", SDL_GetError());
         return -1;
     }
-    return 0;
+
+	return 0;
 }

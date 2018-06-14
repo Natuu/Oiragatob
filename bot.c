@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
 #include "headers/client.h"
 #include "headers/oiragatob.h"
@@ -18,6 +19,12 @@
 
 Infos infos;
 int i;
+
+t_packet* packetList = NULL;
+struct lws_protocols protocols[] = { { "ogar_protocol", callbackOgar, 0,	20 }, { NULL, NULL, 0, 0 } };
+SDL_Window *window = NULL;
+SDL_Renderer *renderer = NULL;
+SDL_Event event;
 
 // =====================================================================================================================================
 //	Start of function definition
@@ -88,7 +95,7 @@ int writePacket(struct lws *wsi)
 
 /****************************************************************************************************************************/
 
-static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
+int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
 	static unsigned int offset=0;
 	static unsigned char rbuf[MAXLEN];
@@ -156,6 +163,10 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 
 				// FONCTION PRINCIPALE
 
+				SDL_RenderPresent(renderer);
+				SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
+				SDL_RenderClear(renderer);
+
 				Buffer command;
 				command.buf = malloc(sizeof(unsigned char));
 				oiragatob(rbuf, &command, &infos);
@@ -195,10 +206,19 @@ static int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void 
 /****************************************************************************************************************************/
 int main(int argc, char **argv)
 {
-	SDL_Window *window = NULL;
-    SDL_Renderer *renderer = NULL;
-    SDL_Color blanc = {255, 255, 255, 255};
     if(0 != init(&window, &renderer, 640, 480)) goto Quit;
+	if(0 != SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255)) {
+		fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+		goto Quit;
+	}
+
+	SDL_SetWindowTitle(window, "Vision du Lechbot");
+
+	if(0 != SDL_RenderClear(renderer)) {
+		fprintf(stderr, "Erreur SDL_RenderClear : %s", SDL_GetError());
+		goto Quit;
+	}
+
     SDL_RenderPresent(renderer);
 
 
@@ -278,6 +298,13 @@ int main(int argc, char **argv)
 	// the main magic here !!
 	while (!forceExit) {
 		lws_service(context, 1000);
+		if (SDL_PollEvent(&event)) {
+			if(event.type == SDL_WINDOWEVENT) {
+        		if(event.window.event == SDL_WINDOWEVENT_CLOSE) {
+					forceExit = 1;
+				}
+			}
+		}
 	}
 
 Quit:

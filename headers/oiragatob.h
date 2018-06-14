@@ -1,3 +1,6 @@
+#ifndef OIGARATOB_H
+#define OIGARATOB_H
+
 typedef struct buffer{
 
     unsigned char *buf;
@@ -39,7 +42,9 @@ typedef struct infos{
 
 } Infos;
 
-int masse(int taille);
+void posInWindow(int *x, int *y, Infos *infos);
+
+int tailleInWindow(int taille, Infos *infos);
 
 void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos);
 
@@ -60,3 +65,5 @@ void creerPaquetDeplacement(Buffer *envoi, Infos *infos);
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole, int food, int ennemis, int virus);
 
 void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsion, int tailleAureole);
+
+#endif

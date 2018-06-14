@@ -8,8 +8,12 @@
 #include <unistd.h>
 #include <math.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
 #include "../headers/oiragatob.h"
+#include "../headers/sdlFonctions.h"
+#include "../headers/client.h"
+
 
 // Fine tuning
 #define DISTANCECOEFF          700
@@ -27,6 +31,26 @@
 #define MECHANTS               2000
 #define GENTILS                100
 #define RATIOSPLITMULTI        1.3
+
+
+void posInWindow(int *x, int *y, Infos *infos){
+
+	int *windowHauteur = malloc(sizeof(int));
+	int *windowLargeur = malloc(sizeof(int));
+
+	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
+	*x = ((float)(*x - infos -> visibleG)/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
+	*y = ((float)(*y - infos -> visibleH)/(float)(infos -> visibleB - infos -> visibleH))  * *windowHauteur;
+}
+
+int tailleInWindow(int taille, Infos *infos) {
+	int *windowHauteur = malloc(sizeof(int));
+	int *windowLargeur = malloc(sizeof(int));
+	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
+	taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
+
+	return taille;
+}
 
 // Permet de convertir un groupe d'octets en int
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet) {
@@ -112,6 +136,12 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     float attrait = 0;
     int k;
     int l;
+	int *x = malloc(sizeof(int));
+	int *y = malloc(sizeof(int));
+	*x = cellVivante.x;
+	*y = cellVivante.y;
+	posInWindow(x, y, infos);
+	int color = 0;
 
     // Indice de la case centrale du remplissage
     zoneX = (cellVivante.x) / (infos->plusPetiteTaille * RESOLUTION);
@@ -122,29 +152,35 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Si food
     if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0 && food) {
         attrait = 1;
+
+		color = 0xEB9532FF;
     }
     // Si virus mais ignorer les vius
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && !virus) {
         if (infos -> taille > 1.4 * cellVivante.taille) {
             attrait = -1;
         }
+		color = 0x2ECC71FF;
     }
     // Si virus
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
         if (infos -> taille > 1.4 * cellVivante.taille) {
             attrait = 1;
         }
+		color = 0x2ECC71FF;
     }
     // Si méchant
     else if (ennemis)
     {
         if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
             attrait = GENTILS;
+			color = 0x6BB9F0FF;
         }
         else {
             // Nombre de cases occupées par la cellule
             nbCases = cellVivante.taille / ((infos->plusPetiteTaille * RESOLUTION) * 2) - 1;
             attrait = -MECHANTS;
+			color = 0xEF4836FF;
         }
     }
 
@@ -156,8 +192,12 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
             infos -> cellules[i].x = cellVivante.x;
             infos -> cellules[i].y = cellVivante.y;
             infos -> cellules[i].taille = cellVivante.taille;
+			color = 0xDB0A5BFF;
         }
     }
+
+	// On affiche la cellule
+	filledCircleColor(renderer, *x, *y, tailleInWindow(cellVivante.taille, infos), color);
 
     // Pour chaque zones qu'occupe la cellule
     for (i = -nbCases; i <= nbCases; i++) {

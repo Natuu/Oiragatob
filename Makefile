@@ -1,19 +1,19 @@
 all: bot
 
-bot: bot.o oiragatob.o
-	gcc -o bot bot.o oiragatob.o sdlFonctions.o -g -Wall -lwebsockets -lm `sdl2-config --cflags --libs`
+bot: bin/bot.o bin/oiragatob.o bin/sdlFonctions.o
+	gcc -o bot bin/bot.o bin/oiragatob.o bin/sdlFonctions.o -g -Wall -lwebsockets -lm `sdl2-config --cflags --libs` -lSDL2_gfx
 
-bot.o: bot.c headers/oiragatob.h headers/client.h headers/sdlFonctions.h
-	gcc -o bot.o -c bot.c -g -Wall
+bin/bot.o: bot.c headers/oiragatob.h headers/client.h headers/sdlFonctions.h
+	gcc -o bin/bot.o -c bot.c -g -Wall
 
-oiragatob.o: src/oiragatob.c headers/oiragatob.h headers/client.h headers/sdlFonctions.h
-	gcc -o oiragatob.o -c src/oiragatob.c -g -Wall
+bin/oiragatob.o: src/oiragatob.c headers/oiragatob.h headers/sdlFonctions.h
+	gcc -o bin/oiragatob.o -c src/oiragatob.c -g -Wall
 
-sdlFonctions.o : src/oiragatob.c headers/sdlFonctions.h
-	gcc -o sdlFonctions.o -c src/sdlFonctions.c -g -Wall
+bin/sdlFonctions.o : src/sdlFonctions.c headers/sdlFonctions.h
+	gcc -o bin/sdlFonctions.o -c src/sdlFonctions.c -g -Wall
 
 clean:
-	rm -rf *.o
+	rm -rf bin/*.o
 
 mrproper: clean
 	rm -rf bot
