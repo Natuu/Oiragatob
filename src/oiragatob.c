@@ -15,24 +15,6 @@
 #include "../headers/client.h"
 
 
-// Fine tuning
-#define DISTANCECOEFF          700
-#define DENSITECOEFF           1
-#define RESOLUTION             0.4
-#define SOLO                   1
-#define REPULSIONBORDS         8
-#define DISTANCEVISE           12
-#define AUREOLAGE              10
-#define TAILLECOEFF            1000
-#define TAILLESPLIT            80
-#define NOMBRESPLIT            3
-#define INTENSITEAUREOLE       0.05
-#define INTENSITEAUREOLEBORDS  0.5
-#define MECHANTS               2000
-#define GENTILS                100
-#define RATIOSPLITMULTI        1.3
-
-
 // Donne la position dans la fenetre d'affichage
 void posInWindow(int *x, int *y, Infos *infos){
 
@@ -58,6 +40,75 @@ int tailleInWindow(int taille, Infos *infos) {
 	free(windowLargeur);
 
 	return taille;
+}
+
+void creerCurseur(int x, int y, float curseurX) {
+
+	SDL_Rect rect = {x, y, 260, 20};
+
+	SDL_SetRenderDrawColor(settingsRenderer, 150, 150, 150, 255);
+	SDL_RenderFillRect(settingsRenderer, &rect);
+	filledCircleColor(settingsRenderer, x, y + 10, 10, 0xFF969696);
+	filledCircleColor(settingsRenderer, x + 259, y + 10, 10, 0xFF969696);
+
+	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 10, 14, 0xFFEEEEEE);
+}
+
+void getCurseurValeur(Infos *infos, int x, int y) {
+
+	x -= 20;
+
+	// On actualise la valeur en fonction des parametres
+
+	// distanceCoeff
+	if (y > 37 && y < 57) {
+		if (x > 0 && x < 260) {
+			infos -> distanceCoeff = (x / 260.0) * 2000;
+		}
+	}
+	// ratioSplitMulti
+	else if (y > 37 + 57 * 1 && y < 57 + 57 * 1) {
+		if (x > 0 && x < 260) {
+			infos -> ratioSplitMulti = (x / 260.0) * 2;
+		}
+	}
+	// aureolage
+	else if (y > 37 + 57 * 2 && y < 57 + 57 * 2) {
+		if (x > 0 && x < 260) {
+			infos -> aureolage = (x / 260.0) * 50;
+		}
+	}
+	// repulsionBords
+	else if (y > 37 + 57 * 3 && y < 57 + 57 * 3) {
+		if (x > 0 && x < 260) {
+			infos -> repulsionBords = (x / 260.0) * 100;
+		}
+	}
+	// intensiteAureole
+	else if (y > 37 + 57 * 4 && y < 57 + 57 * 4) {
+		if (x > 0 && x < 260) {
+			infos -> intensiteAureole = (x / 260.0) * 0.5;
+		}
+	}
+	// nombreSplit
+	else if (y > 37 + 57 * 5 && y < 57 + 57 * 5) {
+		if (x > 0 && x < 260) {
+			infos -> nombreSplit = (x / 260.0) * 16;
+		}
+	}
+	// gentils
+	else if (y > 37 + 57 * 6 && y < 57 + 57 * 6) {
+		if (x > 0 && x < 260) {
+			infos -> gentils = (x / 260.0) * 5000;
+		}
+	}
+	// mechants
+	else if (y > 37 + 57 * 7 && y < 57 + 57 * 7) {
+		if (x > 0 && x < 260) {
+			infos -> mechants = (x / 260.0) * 5000;
+		}
+	}
+
 }
 
 // Permet de convertir un groupe d'octets en int
@@ -152,8 +203,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
 	int color = 0;
 
     // Indice de la case centrale du remplissage
-    zoneX = (cellVivante.x) / (infos->plusPetiteTaille * RESOLUTION);
-    zoneY = (cellVivante.y) / (infos->plusPetiteTaille * RESOLUTION);
+    zoneX = (cellVivante.x) / (infos->plusPetiteTaille * infos -> resolution);
+    zoneY = (cellVivante.y) / (infos->plusPetiteTaille * infos -> resolution);
 
     // Gestion de l'attrait de la cellule
 
@@ -184,14 +235,14 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     else if (ennemis)
     {
         if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
-            attrait = GENTILS;
+            attrait = infos -> gentils;
 			// A l'envers litlle indian
 			color = 0xFF18CAF7;
         }
         else {
             // Nombre de cases occupées par la cellule
-            nbCases = cellVivante.taille / ((infos->plusPetiteTaille * RESOLUTION) * 2) - 1;
-            attrait = -MECHANTS;
+            nbCases = cellVivante.taille / ((infos->plusPetiteTaille * infos -> resolution) * 2) - 1;
+            attrait = -infos ->  mechants;
 			// A l'envers litlle indian
 			color = 0xFF2B39C0;
         }
@@ -230,7 +281,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
                         distance = sqrt(k*k + l*l);
 
                         // Cellule centrale 100 fois plus importante que celles juste autour
-                        if (distance == 0)   distance = INTENSITEAUREOLE;
+                        if (distance == 0)   distance = infos -> intensiteAureole;
 
                         densite[zoneY + j + l][zoneX + i  + k] += cellVivante.taille * attrait / distance;
                     }
@@ -241,7 +292,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
 }
 
 // Auréole les bords
-void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsion, int tailleAureole) {
+void aureoleBords(Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int repulsion, int tailleAureole) {
 
     int i;
     int j;
@@ -261,7 +312,7 @@ void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsi
                         if (j + k < nombreZonesX && i + l < nombreZonesY && j + k >= 0 && i + l >= 0) {
                             distance = sqrt(k*k + l*l);
                             // Cellule centrale 100 fois plus importante que celles juste autour
-                            if (distance == 0)   distance = INTENSITEAUREOLEBORDS;
+                            if (distance == 0)   distance = infos -> intensiteAureoleBords;
                             densite[i + l][j + k] -= repulsion / distance;
                         }
                     }
@@ -279,8 +330,8 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     int k;
     float distanceX = 0;
     float distanceY = 0;
-    float tailleZoneX = infos->plusPetiteTaille * RESOLUTION;
-    float tailleZoneY = infos->plusPetiteTaille * RESOLUTION;
+    float tailleZoneX = infos->plusPetiteTaille * infos -> resolution;
+    float tailleZoneY = infos->plusPetiteTaille * infos -> resolution;
     float posX;
     float posY;
     float distance = 1;
@@ -317,13 +368,13 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                     distance = sqrt((distanceX * distanceX) + (distanceY * distanceY));
 
                     if (distance != 0) {
-    					ratio = densite[i][j] / ((DISTANCECOEFF * distance) + (infos -> cellules[k].taille * TAILLECOEFF));
+    					ratio = densite[i][j] * infos -> densiteCoeff / ((infos -> distanceCoeff * distance) + (infos -> cellules[k].taille * infos -> tailleCoeff));
     				}
     				else {
     					ratio = 0;
     				}
 
-                    // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur DISTANCEVISE fois plus loin)
+                    // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur infos -> distanceVise fois plus loin)
                     if (ratio > bestRatio) {
                         bestRatio = ratio;
                         bestDensite = densite[i][j];
@@ -331,8 +382,8 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
                         infos -> posX = infos -> cellules[k].x;
                         infos -> posY = infos -> cellules[k].y;
 
-                        infos -> sourisX = (int)(posX + DISTANCEVISE * (tailleZoneX * j + 0.5 * tailleZoneX - posX));
-                        infos -> sourisY = (int)(posY + DISTANCEVISE * (tailleZoneY * i + 0.5 * tailleZoneY - posY));
+                        infos -> sourisX = (int)(posX + infos -> distanceVise * (tailleZoneX * j + 0.5 * tailleZoneX - posX));
+                        infos -> sourisY = (int)(posY + infos -> distanceVise * (tailleZoneY * i + 0.5 * tailleZoneY - posY));
 
                         if (infos -> sourisX <= 0) infos -> sourisX = 1;
                         if (infos -> sourisY <= 0) infos -> sourisY = 1;
@@ -344,10 +395,10 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
         }
     }
 
-    if (SOLO && infos -> plusGrosseTaille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+    if (infos -> solo && infos -> plusGrosseTaille > infos -> tailleSplit && nombreSplit < infos -> nombreSplit) {
         infos -> split = 1;
     }
-    else if (!SOLO && bestDensite * INTENSITEAUREOLE > infos -> taille * RATIOSPLITMULTI * GENTILS && infos -> taille > TAILLESPLIT && nombreSplit < NOMBRESPLIT) {
+    else if (!infos -> solo && bestDensite * infos -> intensiteAureole > infos -> taille * infos -> ratioSplitMulti * infos -> gentils && infos -> taille > infos -> tailleSplit && nombreSplit < infos -> nombreSplit) {
         infos -> split = 1;
     }
 
@@ -520,8 +571,8 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
         int nombreZonesX;
         int nombreZonesY;
 
-        nombreZonesX = (infos->carteD - infos->carteG) / (infos->plusPetiteTaille * RESOLUTION);
-        nombreZonesY = (infos->carteB - infos->carteH) / (infos->plusPetiteTaille * RESOLUTION);
+        nombreZonesX = (infos->carteD - infos->carteG) / (infos->plusPetiteTaille * infos -> resolution);
+        nombreZonesY = (infos->carteB - infos->carteH) / (infos->plusPetiteTaille * infos -> resolution);
 
         // On pense aux zones coupées
         nombreZonesX ++;
@@ -576,15 +627,50 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
             // Remplissage de la grille de densité
             // On hydrate une fois sans virus ni ennemis et une fois avec
-            hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, AUREOLAGE, 1, !SOLO, SOLO);
+            hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, infos -> aureolage, 1, !infos -> solo, infos -> solo);
         }
 
+		// On affiche la vision
 		SDL_RenderPresent(renderer);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
 		SDL_RenderClear(renderer);
 
-        aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, AUREOLAGE);
+
+		SDL_SetRenderDrawBlendMode(settingsRenderer, SDL_BLENDMODE_BLEND);
+
+		// On vérifie si les curseurs ont changé
+		if (SDL_PollEvent(&event)) {
+			if(event.type == SDL_MOUSEBUTTONUP) {
+		        getCurseurValeur(infos, event.button.x, event.button.y);
+		    }
+		}
+
+		// On set nos curseurs
+		float curseurDistance = infos -> distanceCoeff / 2000;
+		float curseurRatioSplitMulti = infos -> ratioSplitMulti / 2;
+		float curseurAureolage = infos -> aureolage / 50;
+		float curseurRepulsionBords = infos -> repulsionBords / 100;
+		float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
+		float curseurNombreSplit = infos -> nombreSplit / 16;
+		float curseurGentils = infos -> gentils / 5000;
+		float curseurMechants = infos -> mechants / 5000;
+
+		// On affiche les settings
+		creerCurseur(20, 37, curseurDistance);
+		creerCurseur(20, 37 + 57 * 1, curseurRatioSplitMulti);
+		creerCurseur(20, 37 + 57 * 2, curseurAureolage);
+		creerCurseur(20, 37 + 57 * 3, curseurRepulsionBords);
+		creerCurseur(20, 37 + 57 * 4, curseurIntensiteAureole);
+		creerCurseur(20, 37 + 57 * 5, curseurNombreSplit);
+		creerCurseur(20, 37 + 57 * 6, curseurGentils);
+		creerCurseur(20, 37 + 57 * 7, curseurMechants);
+
+		SDL_RenderPresent(settingsRenderer);
+		SDL_SetRenderDrawColor(settingsRenderer, 60, 60, 60, 255);
+		SDL_RenderClear(settingsRenderer);
+
+        aureoleBords(infos, densite, nombreZonesX, nombreZonesY, infos -> repulsionBords, infos -> aureolage);
 
         // On se dirige ou on se splitte
         pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);

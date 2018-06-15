@@ -14,6 +14,23 @@
 #include "headers/oiragatob.h"
 #include "headers/sdlFonctions.h"
 
+// Fine tuning
+#define DISTANCECOEFF          700
+#define DENSITECOEFF           1
+#define RESOLUTION             0.4
+#define SOLO                   1
+#define REPULSIONBORDS         8
+#define DISTANCEVISE           12
+#define AUREOLAGE              10
+#define TAILLECOEFF            1000
+#define TAILLESPLIT            80
+#define NOMBRESPLIT            3
+#define INTENSITEAUREOLE       0.05
+#define INTENSITEAUREOLEBORDS  0.5
+#define MECHANTS               2000
+#define GENTILS                100
+#define RATIOSPLITMULTI        1.3
+
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
 // call with: ./bot -o agar.io 127.0.0.1:1443
 
@@ -24,11 +41,13 @@ t_packet* packetList = NULL;
 struct lws_protocols protocols[] = { { "ogar_protocol", callbackOgar, 0,	20 }, { NULL, NULL, 0, 0 } };
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
+SDL_Window *settings = NULL;
+SDL_Renderer *settingsRenderer = NULL;
 SDL_Event event;
 
-// =====================================================================================================================================
+// =========================================================================================================================
 //	Start of function definition
-// =====================================================================================================================================
+// =========================================================================================================================
 
 // Caught on CTRL C
 void sighandler(int sig)
@@ -133,6 +152,22 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 			infos.viserX[i] = 0;
 		}
 
+		infos.distanceCoeff = DISTANCECOEFF;
+		infos.densiteCoeff = DENSITECOEFF;
+		infos.resolution = RESOLUTION;
+		infos.solo = SOLO;
+		infos.repulsionBords = REPULSIONBORDS;
+		infos.distanceVise= DISTANCEVISE;
+		infos.aureolage = AUREOLAGE;
+		infos.tailleCoeff = TAILLECOEFF;
+		infos.tailleSplit = TAILLESPLIT;
+		infos.nombreSplit= NOMBRESPLIT;
+		infos.intensiteAureole = INTENSITEAUREOLE;
+		infos.intensiteAureoleBords = INTENSITEAUREOLEBORDS;
+		infos.mechants = MECHANTS;
+		infos.gentils = GENTILS;
+		infos.ratioSplitMulti = RATIOSPLITMULTI;
+
 		// Ouvrir la connexion
 		unsigned char connexion[] = {0xff, 0x00, 0x00, 0x00, 0x00};
 		sendCommand(wsi, connexion, 5);
@@ -168,6 +203,14 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 				oiragatob(rbuf, &command, &infos);
 				sendCommand(wsi, command.buf, command.len);
 				free(command.buf);
+
+				if (SDL_PollEvent(&event)) {
+					if(event.type == SDL_WINDOWEVENT) {
+		        		if(event.window.event == SDL_WINDOWEVENT_CLOSE) {
+							forceExit = 1;
+						}
+					}
+				}
 
 				offset=0;
 			}
@@ -216,6 +259,31 @@ int main(int argc, char **argv)
 	}
 
     SDL_RenderPresent(renderer);
+
+	if(0 != init(&settings, &settingsRenderer, 300, 480)) goto Quit;
+	if(0 != SDL_SetRenderDrawColor(settingsRenderer, 200, 200, 200, 255)) {
+		fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+		goto Quit;
+	}
+
+	int *x = malloc(sizeof(int));
+	int *y = malloc(sizeof(int));
+
+	SDL_GetWindowPosition(window, x, y);
+
+	SDL_SetWindowPosition(settings, *x + 645, *y);
+
+	free(x);
+	free(y);
+
+	SDL_SetWindowTitle(settings, "Parametres du Lechbot");
+
+	if(0 != SDL_RenderClear(settingsRenderer)) {
+		fprintf(stderr, "Erreur SDL_RenderClear : %s", SDL_GetError());
+		goto Quit;
+	}
+
+    SDL_RenderPresent(settingsRenderer);
 
 
 	int n = 0;
@@ -294,18 +362,13 @@ int main(int argc, char **argv)
 	// the main magic here !!
 	while (!forceExit) {
 		lws_service(context, 1000);
-		if (SDL_PollEvent(&event)) {
-			if(event.type == SDL_WINDOWEVENT) {
-        		if(event.window.event == SDL_WINDOWEVENT_CLOSE) {
-					forceExit = 1;
-				}
-			}
-		}
 	}
 
 Quit:
 	if(NULL != renderer) SDL_DestroyRenderer(renderer);
 	if(NULL != window) SDL_DestroyWindow(window);
+	if(NULL != settingsRenderer) SDL_DestroyRenderer(renderer);
+	if(NULL != settings) SDL_DestroyWindow(window);
 	SDL_Quit();
 
 	// if there is some errors, we just quit

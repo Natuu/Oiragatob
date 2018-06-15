@@ -6,6 +6,8 @@
 
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
+extern SDL_Window *settings;
+extern SDL_Renderer *settingsRenderer;
 extern SDL_Event event;
 
 int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);

@@ -39,12 +39,31 @@ typedef struct infos{
     int viserX[9];
     int viserY[9];
     int atteintViser;
+	float distanceCoeff;
+	float densiteCoeff;
+	float resolution;
+	float solo;
+	float repulsionBords;
+	float distanceVise;
+	float aureolage;
+	float tailleCoeff;
+	float tailleSplit;
+	float nombreSplit;
+	float intensiteAureole;
+	float intensiteAureoleBords;
+	float mechants;
+	float gentils;
+	float ratioSplitMulti;
 
 } Infos;
+
+void creerCurseur(int x, int y, float curseurX);
 
 void posInWindow(int *x, int *y, Infos *infos);
 
 int tailleInWindow(int taille, Infos *infos);
+
+void getCurseurValeur(Infos *infos, int x, int y);
 
 void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos);
 
@@ -64,6 +83,6 @@ void creerPaquetDeplacement(Buffer *envoi, Infos *infos);
 
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole, int food, int ennemis, int virus);
 
-void aureoleBords(int **densite, int nombreZonesX, int nombreZonesY, int repulsion, int tailleAureole);
+void aureoleBords(Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int repulsion, int tailleAureole);
 
 #endif
