@@ -33,6 +33,7 @@
 #define RATIOSPLITMULTI        1.3
 
 
+// Donne la position dans la fenetre d'affichage
 void posInWindow(int *x, int *y, Infos *infos){
 
 	int *windowHauteur = malloc(sizeof(int));
@@ -46,6 +47,7 @@ void posInWindow(int *x, int *y, Infos *infos){
 	free(windowLargeur);
 }
 
+// Donne la taille dans la fenetre d'affichage
 int tailleInWindow(int taille, Infos *infos) {
 	int *windowHauteur = malloc(sizeof(int));
 	int *windowLargeur = malloc(sizeof(int));
@@ -159,34 +161,39 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0 && food) {
         attrait = 1;
 
-		color = 0xEB9532FF;
+		// A l'envers litlle indian
+		color = 0xFF0694F8;
     }
     // Si virus mais ignorer les vius
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && !virus) {
         if (infos -> taille > 1.4 * cellVivante.taille) {
             attrait = -1;
         }
-		color = 0x2ECC71FF;
+		// A l'envers litlle indian
+		color = 0xFF40E600;
     }
     // Si virus
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
         if (infos -> taille > 1.4 * cellVivante.taille) {
             attrait = 1;
         }
-		color = 0x2ECC71FF;
+		// A l'envers litlle indian
+		color = 0xFF40E600;
     }
     // Si méchant
     else if (ennemis)
     {
         if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
             attrait = GENTILS;
-			color = 0x6BB9F0FF;
+			// A l'envers litlle indian
+			color = 0xFF18CAF7;
         }
         else {
             // Nombre de cases occupées par la cellule
             nbCases = cellVivante.taille / ((infos->plusPetiteTaille * RESOLUTION) * 2) - 1;
             attrait = -MECHANTS;
-			color = 0xEF4836FF;
+			// A l'envers litlle indian
+			color = 0xFF2B39C0;
         }
     }
 
@@ -198,7 +205,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
             infos -> cellules[i].x = cellVivante.x;
             infos -> cellules[i].y = cellVivante.y;
             infos -> cellules[i].taille = cellVivante.taille;
-			color = 0xDB0A5BFF;
+			// A l'envers litlle indian
+			color = 0xFFFEB519;
         }
     }
 
@@ -572,6 +580,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
         }
 
 		SDL_RenderPresent(renderer);
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 		SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
 		SDL_RenderClear(renderer);
 
