@@ -9,6 +9,7 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "../headers/sdlFonctions.h"
 
@@ -18,6 +19,12 @@ int init(SDL_Window **window, SDL_Renderer **renderer, int w, int h)
     if(0 != SDL_Init(SDL_INIT_VIDEO))
     {
         fprintf(stderr, "Erreur SDL_Init : %s", SDL_GetError());
+        return -1;
+    }
+
+	if(0 != TTF_Init())
+    {
+        fprintf(stderr, "Erreur TTF_Init : %s", SDL_GetError());
         return -1;
     }
 

@@ -9,6 +9,7 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "headers/client.h"
 #include "headers/oiragatob.h"
@@ -18,7 +19,6 @@
 #define DISTANCECOEFF          700
 #define DENSITECOEFF           1
 #define RESOLUTION             0.4
-#define SOLO                   1
 #define REPULSIONBORDS         8
 #define DISTANCEVISE           12
 #define AUREOLAGE              10
@@ -44,6 +44,7 @@ SDL_Renderer *renderer = NULL;
 SDL_Window *settings = NULL;
 SDL_Renderer *settingsRenderer = NULL;
 SDL_Event event;
+int solo = 0;
 
 // =========================================================================================================================
 //	Start of function definition
@@ -155,7 +156,7 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 		infos.distanceCoeff = DISTANCECOEFF;
 		infos.densiteCoeff = DENSITECOEFF;
 		infos.resolution = RESOLUTION;
-		infos.solo = SOLO;
+		infos.solo = solo;
 		infos.repulsionBords = REPULSIONBORDS;
 		infos.distanceVise= DISTANCEVISE;
 		infos.aureolage = AUREOLAGE;
@@ -300,6 +301,7 @@ int main(int argc, char **argv)
 	if (argc < 2)
 	goto usage;
 
+	i.origin = "agar.io";
 
 	while (n >= 0) {
 		n = getopt(argc, argv, "hsp:P:o:");
@@ -307,13 +309,10 @@ int main(int argc, char **argv)
 		continue;
 		switch (n) {
 			case 's':
-			i.ssl_connection = 2;
+			solo = 1;
 			break;
 			case 'p':
 			i.port = atoi(optarg);
-			break;
-			case 'o':
-			i.origin = optarg;
 			break;
 			case 'P':
 			info.http_proxy_address = optarg;

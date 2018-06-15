@@ -9,6 +9,7 @@
 #include <math.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "../headers/oiragatob.h"
 #include "../headers/sdlFonctions.h"
@@ -42,7 +43,8 @@ int tailleInWindow(int taille, Infos *infos) {
 	return taille;
 }
 
-void creerCurseur(int x, int y, float curseurX) {
+// Crée les curseurs de settings
+void creerCurseur(int x, int y, float curseurX, char *toWrite) {
 
 	SDL_Rect rect = {x, y, 260, 20};
 
@@ -52,8 +54,31 @@ void creerCurseur(int x, int y, float curseurX) {
 	filledCircleColor(settingsRenderer, x + 259, y + 10, 10, 0xFF969696);
 
 	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 10, 14, 0xFFEEEEEE);
+
+	TTF_Font* pfont;
+	pfont = TTF_OpenFont("NotoSans.ttf", 50);
+
+	SDL_Color color;
+	color.r = 245;
+	color.g = 245;
+	color.b = 245;
+	color.a = 255;
+	SDL_Surface* textSurface = TTF_RenderUTF8_Blended(pfont, toWrite, color);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(settingsRenderer, textSurface);
+
+	SDL_Rect rekt;
+	rekt.x = x - 10;
+	rekt.y = y - 25;
+	rekt.w = strlen(toWrite) * 6;
+	rekt.h = 20;
+
+	SDL_RenderCopy(settingsRenderer, texture, NULL, &rekt);
+
+	SDL_FreeSurface(textSurface);
+	SDL_DestroyTexture(texture);
 }
 
+// Réccupère la valeur du curseur en cas de clic dse la souris
 void getCurseurValeur(Infos *infos, int x, int y) {
 
 	x -= 20;
@@ -656,15 +681,32 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 		float curseurGentils = infos -> gentils / 5000;
 		float curseurMechants = infos -> mechants / 5000;
 
+		char toWrite[50];
+
 		// On affiche les settings
-		creerCurseur(20, 37, curseurDistance);
-		creerCurseur(20, 37 + 57 * 1, curseurRatioSplitMulti);
-		creerCurseur(20, 37 + 57 * 2, curseurAureolage);
-		creerCurseur(20, 37 + 57 * 3, curseurRepulsionBords);
-		creerCurseur(20, 37 + 57 * 4, curseurIntensiteAureole);
-		creerCurseur(20, 37 + 57 * 5, curseurNombreSplit);
-		creerCurseur(20, 37 + 57 * 6, curseurGentils);
-		creerCurseur(20, 37 + 57 * 7, curseurMechants);
+		sprintf(toWrite, "Distance : %d", (int)infos -> distanceCoeff);
+		creerCurseur(20, 37, curseurDistance, toWrite);
+
+		sprintf(toWrite, "Ratio Split : %d", (int)(infos -> ratioSplitMulti * 100));
+		creerCurseur(20, 37 + 57 * 1, curseurRatioSplitMulti, toWrite);
+
+		sprintf(toWrite, "Auréolage : %d", (int)infos -> aureolage);
+		creerCurseur(20, 37 + 57 * 2, curseurAureolage, toWrite);
+
+		sprintf(toWrite, "Repulsion Bords : %d", (int)infos -> repulsionBords);
+		creerCurseur(20, 37 + 57 * 3, curseurRepulsionBords, toWrite);
+
+		sprintf(toWrite, "Intensité Auréole : %d", (int)(infos -> intensiteAureole * 100));
+		creerCurseur(20, 37 + 57 * 4, curseurIntensiteAureole, toWrite);
+
+		sprintf(toWrite, "Nombre split : %d", (int)infos -> nombreSplit);
+		creerCurseur(20, 37 + 57 * 5, curseurNombreSplit, toWrite);
+
+		sprintf(toWrite, "Gentils : %d", (int)infos -> gentils);
+		creerCurseur(20, 37 + 57 * 6, curseurGentils, toWrite);
+
+		sprintf(toWrite, "Méchants : %d", (int)infos -> mechants);
+		creerCurseur(20, 37 + 57 * 7, curseurMechants, toWrite);
 
 		SDL_RenderPresent(settingsRenderer);
 		SDL_SetRenderDrawColor(settingsRenderer, 60, 60, 60, 255);

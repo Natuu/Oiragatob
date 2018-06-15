@@ -57,7 +57,7 @@ typedef struct infos{
 
 } Infos;
 
-void creerCurseur(int x, int y, float curseurX);
+void creerCurseur(int x, int y, float curseurX, char *toWrite);
 
 void posInWindow(int *x, int *y, Infos *infos);
 
