@@ -163,10 +163,6 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 
 				// FONCTION PRINCIPALE
 
-				SDL_RenderPresent(renderer);
-				SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
-				SDL_RenderClear(renderer);
-
 				Buffer command;
 				command.buf = malloc(sizeof(unsigned char));
 				oiragatob(rbuf, &command, &infos);

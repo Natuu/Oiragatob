@@ -19,7 +19,7 @@
 #define DISTANCECOEFF          700
 #define DENSITECOEFF           1
 #define RESOLUTION             0.4
-#define SOLO                   0
+#define SOLO                   1
 #define REPULSIONBORDS         8
 #define DISTANCEVISE           12
 #define AUREOLAGE              10
@@ -570,6 +570,10 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
             // On hydrate une fois sans virus ni ennemis et une fois avec
             hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, AUREOLAGE, 1, !SOLO, SOLO);
         }
+
+		SDL_RenderPresent(renderer);
+		SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
+		SDL_RenderClear(renderer);
 
         aureoleBords(densite, nombreZonesX, nombreZonesY, REPULSIONBORDS, AUREOLAGE);
 
