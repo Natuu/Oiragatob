@@ -121,7 +121,7 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 	// gentils
 	else if (y > 37 + 57 * 6 && y < 57 + 57 * 6) {
 		if (x > 0 && x < 260) {
-			infos -> gentils = (x / 260.0) * 500;
+			infos -> gentils = (x / 260.0) * 50;
 		}
 	}
 	// mechants
@@ -675,7 +675,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 		float curseurRepulsionBords = infos -> repulsionBords / 100;
 		float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
 		float curseurNombreSplit = infos -> nombreSplit / 16;
-		float curseurGentils = infos -> gentils / 200;
+		float curseurGentils = infos -> gentils / 50;
 		float curseurMechants = infos -> mechants / 10000;
 
 		char toWrite[50];

@@ -28,7 +28,7 @@
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.5
 #define MECHANTS               4000
-#define GENTILS                100
+#define GENTILS                30
 #define RATIOSPLITMULTI        1.3
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
