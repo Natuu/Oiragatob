@@ -35,10 +35,10 @@
 
 void posInWindow(int *x, int *y, Infos *infos){
 
-	int windowHauteur;
-	int windowLargeur;
+	int *windowHauteur = malloc(sizeof(int));
+	int *windowLargeur = malloc(sizeof(int));
 
-	SDL_GetWindowSize(window, &windowLargeur, &windowHauteur);
+	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
 	*x = ((float)(*x - infos -> visibleG)/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
 	*y = ((float)(*y - infos -> visibleH)/(float)(infos -> visibleB - infos -> visibleH))  * *windowHauteur;
 
@@ -47,9 +47,9 @@ void posInWindow(int *x, int *y, Infos *infos){
 }
 
 int tailleInWindow(int taille, Infos *infos) {
-	int windowHauteur;
-	int windowLargeur;
-	SDL_GetWindowSize(window, &windowLargeur, &windowHauteur);
+	int *windowHauteur = malloc(sizeof(int));
+	int *windowLargeur = malloc(sizeof(int));
+	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
 	taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
 
 	free(windowHauteur);
@@ -142,10 +142,10 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     float attrait = 0;
     int k;
     int l;
-	int x;
-	int y;
-	x = cellVivante.x;
-	y = cellVivante.y;
+	int *x = malloc(sizeof(int));
+	int *y = malloc(sizeof(int));
+	*x = cellVivante.x;
+	*y = cellVivante.y;
 	posInWindow(x, y, infos);
 	int color = 0;
 
@@ -203,7 +203,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
 
 	// On affiche la cellule
-	filledCircleColor(renderer, &x, &y, tailleInWindow(cellVivante.taille, infos), color);
+	filledCircleColor(renderer, *x, *y, tailleInWindow(cellVivante.taille, infos), color);
 
 	free(x);
 	free(y);
