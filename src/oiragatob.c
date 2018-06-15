@@ -41,6 +41,9 @@ void posInWindow(int *x, int *y, Infos *infos){
 	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
 	*x = ((float)(*x - infos -> visibleG)/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
 	*y = ((float)(*y - infos -> visibleH)/(float)(infos -> visibleB - infos -> visibleH))  * *windowHauteur;
+
+	free(windowHauteur);
+	free(windowLargeur);
 }
 
 int tailleInWindow(int taille, Infos *infos) {
@@ -48,6 +51,9 @@ int tailleInWindow(int taille, Infos *infos) {
 	int *windowLargeur = malloc(sizeof(int));
 	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
 	taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
+
+	free(windowHauteur);
+	free(windowLargeur);
 
 	return taille;
 }
@@ -198,6 +204,9 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
 
 	// On affiche la cellule
 	filledCircleColor(renderer, *x, *y, tailleInWindow(cellVivante.taille, infos), color);
+
+	free(x);
+	free(y);
 
     // Pour chaque zones qu'occupe la cellule
     for (i = -nbCases; i <= nbCases; i++) {
