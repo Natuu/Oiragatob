@@ -9,6 +9,7 @@ extern SDL_Renderer *renderer;
 extern SDL_Window *settings;
 extern SDL_Renderer *settingsRenderer;
 extern SDL_Event event;
+extern TTF_Font* pfont;
 
 int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len);
 

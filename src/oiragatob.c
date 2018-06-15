@@ -55,9 +55,6 @@ void creerCurseur(int x, int y, float curseurX, char *toWrite) {
 
 	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 10, 14, 0xFFEEEEEE);
 
-	TTF_Font* pfont;
-	pfont = TTF_OpenFont("NotoSans.ttf", 50);
-
 	SDL_Color color;
 	color.r = 245;
 	color.g = 245;
@@ -124,13 +121,13 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 	// gentils
 	else if (y > 37 + 57 * 6 && y < 57 + 57 * 6) {
 		if (x > 0 && x < 260) {
-			infos -> gentils = (x / 260.0) * 5000;
+			infos -> gentils = (x / 260.0) * 500;
 		}
 	}
 	// mechants
 	else if (y > 37 + 57 * 7 && y < 57 + 57 * 7) {
 		if (x > 0 && x < 260) {
-			infos -> mechants = (x / 260.0) * 5000;
+			infos -> mechants = (x / 260.0) * 10000;
 		}
 	}
 
@@ -678,8 +675,8 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 		float curseurRepulsionBords = infos -> repulsionBords / 100;
 		float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
 		float curseurNombreSplit = infos -> nombreSplit / 16;
-		float curseurGentils = infos -> gentils / 5000;
-		float curseurMechants = infos -> mechants / 5000;
+		float curseurGentils = infos -> gentils / 200;
+		float curseurMechants = infos -> mechants / 10000;
 
 		char toWrite[50];
 

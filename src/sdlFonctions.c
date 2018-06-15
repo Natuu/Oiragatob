@@ -12,6 +12,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "../headers/sdlFonctions.h"
+#include "../headers/client.h"
 
 
 int init(SDL_Window **window, SDL_Renderer **renderer, int w, int h)
@@ -27,6 +28,7 @@ int init(SDL_Window **window, SDL_Renderer **renderer, int w, int h)
         fprintf(stderr, "Erreur TTF_Init : %s", SDL_GetError());
         return -1;
     }
+	pfont = TTF_OpenFont("NotoSans.ttf", 50);
 
     if(0 != SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE , window, renderer))
     {

@@ -27,7 +27,7 @@
 #define NOMBRESPLIT            3
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.5
-#define MECHANTS               2000
+#define MECHANTS               4000
 #define GENTILS                100
 #define RATIOSPLITMULTI        1.3
 
@@ -44,6 +44,7 @@ SDL_Renderer *renderer = NULL;
 SDL_Window *settings = NULL;
 SDL_Renderer *settingsRenderer = NULL;
 SDL_Event event;
+TTF_Font *pfont = NULL;
 int solo = 0;
 
 // =========================================================================================================================
