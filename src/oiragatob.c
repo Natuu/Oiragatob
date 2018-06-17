@@ -46,14 +46,18 @@ int tailleInWindow(int taille, Infos *infos) {
 // Crée les curseurs de settings
 void creerCurseur(int x, int y, float curseurX, char *toWrite) {
 
-	SDL_Rect rect = {x, y, 260, 20};
+	SDL_Rect rect = {x, y, 260, 23};
 
 	SDL_SetRenderDrawColor(settingsRenderer, 150, 150, 150, 255);
 	SDL_RenderFillRect(settingsRenderer, &rect);
-	filledCircleColor(settingsRenderer, x, y + 10, 10, 0xFF969696);
-	filledCircleColor(settingsRenderer, x + 259, y + 10, 10, 0xFF969696);
+	filledCircleColor(settingsRenderer, x, y + 11, 11, 0xFF66E600);
+	filledCircleColor(settingsRenderer, x + 259, y + 11, 11, 0xFF969696);
 
-	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 10, 14, 0xFFEEEEEE);
+	SDL_Rect prog = {x, y, 260 * curseurX, 23};
+	SDL_SetRenderDrawColor(settingsRenderer, 0, 0xE6, 0x66, 255);
+	SDL_RenderFillRect(settingsRenderer, &prog);
+
+	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 11, 14, 0xFFEEEEEE);
 
 	SDL_Color color;
 	color.r = 245;

@@ -30,7 +30,7 @@ int init(SDL_Window **window, SDL_Renderer **renderer, int w, int h)
     }
 	pfont = TTF_OpenFont("NotoSans.ttf", 50);
 
-    if(0 != SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE , window, renderer))
+    if(0 != SDL_CreateWindowAndRenderer(w, h, SDL_WINDOW_SHOWN, window, renderer))
     {
         fprintf(stderr, "Erreur SDL_CreateWindowAndRenderer : %s", SDL_GetError());
         return -1;

@@ -272,8 +272,8 @@ int main(int argc, char **argv)
 	int *y = malloc(sizeof(int));
 
 	SDL_GetWindowPosition(window, x, y);
-
-	SDL_SetWindowPosition(settings, *x + 645, *y);
+	SDL_SetWindowPosition(window, *x - 150, *y);
+	SDL_SetWindowPosition(settings, *x + 645 - 150, *y);
 
 	free(x);
 	free(y);
@@ -367,8 +367,8 @@ int main(int argc, char **argv)
 Quit:
 	if(NULL != renderer) SDL_DestroyRenderer(renderer);
 	if(NULL != window) SDL_DestroyWindow(window);
-	if(NULL != settingsRenderer) SDL_DestroyRenderer(renderer);
-	if(NULL != settings) SDL_DestroyWindow(window);
+	if(NULL != settingsRenderer) SDL_DestroyRenderer(settingsRenderer);
+	if(NULL != settings) SDL_DestroyWindow(settings);
 	SDL_Quit();
 
 	// if there is some errors, we just quit
