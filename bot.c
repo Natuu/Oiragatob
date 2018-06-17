@@ -41,6 +41,8 @@ t_packet* packetList = NULL;
 struct lws_protocols protocols[] = { { "ogar_protocol", callbackOgar, 0,	20 }, { NULL, NULL, 0, 0 } };
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
+SDL_Window *densiteWindow = NULL;
+SDL_Renderer *densiteRenderer = NULL;
 SDL_Window *settings = NULL;
 SDL_Renderer *settingsRenderer = NULL;
 SDL_Event event;
@@ -132,7 +134,7 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 		infos.carteH = 0;
 		infos.carteB = 0;
 		infos.taille = 10;
-		infos.plusPetiteTaille = 0;
+		infos.plusPetiteTaille = 9;
 		infos.plusGrosseTaille = 999999;
 		infos.posX = 0;
 		infos.posY = 0;
@@ -255,6 +257,14 @@ int main(int argc, char **argv)
 
 	SDL_SetWindowTitle(window, "Vision du Lechbot");
 
+	if(0 != init(&densiteWindow, &densiteRenderer, 500, 480)) goto Quit;
+	if(0 != SDL_SetRenderDrawColor(densiteRenderer, 245, 245, 245, 255)) {
+		fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
+		goto Quit;
+	}
+
+	SDL_SetWindowTitle(densiteWindow, "Densité");
+
 	if(0 != SDL_RenderClear(renderer)) {
 		fprintf(stderr, "Erreur SDL_RenderClear : %s", SDL_GetError());
 		goto Quit;
@@ -268,16 +278,6 @@ int main(int argc, char **argv)
 		goto Quit;
 	}
 
-	int *x = malloc(sizeof(int));
-	int *y = malloc(sizeof(int));
-
-	SDL_GetWindowPosition(window, x, y);
-	SDL_SetWindowPosition(window, *x - 150, *y);
-	SDL_SetWindowPosition(settings, *x + 645 - 150, *y);
-
-	free(x);
-	free(y);
-
 	SDL_SetWindowTitle(settings, "Parametres du Lechbot");
 
 	if(0 != SDL_RenderClear(settingsRenderer)) {
@@ -286,6 +286,17 @@ int main(int argc, char **argv)
 	}
 
     SDL_RenderPresent(settingsRenderer);
+
+	int *x = malloc(sizeof(int));
+	int *y = malloc(sizeof(int));
+
+	SDL_GetWindowPosition(window, x, y);
+	SDL_SetWindowPosition(window, *x, *y);
+	SDL_SetWindowPosition(densiteWindow, *x - 505, *y);
+	SDL_SetWindowPosition(settings, *x + 645, *y);
+
+	free(x);
+	free(y);
 
 
 	int n = 0;
@@ -367,6 +378,8 @@ int main(int argc, char **argv)
 Quit:
 	if(NULL != renderer) SDL_DestroyRenderer(renderer);
 	if(NULL != window) SDL_DestroyWindow(window);
+	if(NULL != densiteRenderer) SDL_DestroyRenderer(densiteRenderer);
+	if(NULL != densiteWindow) SDL_DestroyWindow(densiteWindow);
 	if(NULL != settingsRenderer) SDL_DestroyRenderer(settingsRenderer);
 	if(NULL != settings) SDL_DestroyWindow(settings);
 	SDL_Quit();

@@ -57,11 +57,15 @@ typedef struct infos{
 
 } Infos;
 
+void afficherSettings(Infos *infos);
+
+void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **densite);
+
 void creerCurseur(int x, int y, float curseurX, char *toWrite);
 
 void posInWindow(int *x, int *y, Infos *infos);
 
-int tailleInWindow(int taille, Infos *infos);
+int tailleInWindow(int taille, Infos *infos, int largeur);
 
 void getCurseurValeur(Infos *infos, int x, int y);
 
