@@ -243,6 +243,23 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 /****************************************************************************************************************************/
 int main(int argc, char **argv)
 {
+	FILE* fichier = NULL;
+
+    fichier = fopen("param.txt", "a");
+
+	srandom(time(NULL));
+
+	int secondesDepart = time(NULL);
+	int secondesEcoules = 0;
+	int distanceCoeff = rand() % 2000;
+	int ratioSplitMulti = rand() % 10;
+	int aureolage = rand() % 50;
+	int repulsionBords = rand() % 100;
+	float intensiteAureole = (float)(rand() % 50)/100;
+	int nombreSplit = rand() % 16;
+	int gentils = rand() % 50;
+	int mechants = rand() % 100;
+	int virus = rand() % 50;
 	// On initialise la fenetre de vision
     if(0 != init(&window, &renderer, 915, 530)) goto Quit;
 	SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
@@ -351,7 +368,39 @@ int main(int argc, char **argv)
 	forceExit=0;
 	// the main magic here !!
 	while (!forceExit) {
-		lws_service(context, 1000);
+		secondesEcoules = time(NULL) - secondesDepart;
+		//printf("%d\n",secondesEcoules);
+		if (secondesEcoules < 60){
+			lws_service(context, 1000);
+			infos.distanceCoeff = distanceCoeff;
+			//printf("%d\n",infos.taille);
+			infos.ratioSplitMulti  = ratioSplitMulti;
+			infos.aureolage = aureolage;
+			infos.repulsionBords = repulsionBords;
+			infos.intensiteAureole = intensiteAureole;
+			infos.nombreSplit = nombreSplit;
+			infos.gentils = gentils;
+			infos.mechants = mechants;
+			infos.virus = virus;
+
+		}
+		else {
+			if (infos.taille > 100){
+				fprintf(fichier,"Score %d \n\n", infos.taille);
+				fprintf(fichier,"Distance = %lf \n", infos.distanceCoeff);
+				fprintf(fichier,"ratioSplitMulti = %lf \n", infos.ratioSplitMulti);
+				fprintf(fichier,"aureolage = %lf \n", infos.aureolage);
+				fprintf(fichier,"repulsionBords = %lf \n", infos.repulsionBords);
+				fprintf(fichier,"intensiteAureole = %lf \n", infos.intensiteAureole);
+				fprintf(fichier,"nombreSplit = %lf \n", infos.nombreSplit);
+				fprintf(fichier,"gentils = %lf \n", infos.gentils);
+				fprintf(fichier,"mechants = %lf \n", infos.mechants);
+				fprintf(fichier,"virus = %lf \n", infos.virus);
+				fprintf(fichier, "\n\n --------- \n\n");
+			}
+			fclose(fichier);
+			forceExit = 1;
+		}
 	}
 
 	// On destroy les fenetres et renderer

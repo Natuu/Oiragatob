@@ -1,3 +1,30 @@
-0
-distance = 0
-aureolage = 0
+Score 138 
+
+Distance = 1474.000000 
+ratioSplitMulti = 5.000000 
+aureolage = 38.000000 
+repulsionBords = 12.000000 
+intensiteAureole = 0.190000 
+nombreSplit = 3.000000 
+gentils = 26.000000 
+mechants = 50.000000 
+virus = 14.000000 
+
+
+ --------- 
+
+Score 142 
+
+Distance = 562.000000 
+ratioSplitMulti = 7.000000 
+aureolage = 21.000000 
+repulsionBords = 89.000000 
+intensiteAureole = 0.030000 
+nombreSplit = 11.000000 
+gentils = 11.000000 
+mechants = 20.000000 
+virus = 41.000000 
+
+
+ --------- 
+
