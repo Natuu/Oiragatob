@@ -28,8 +28,9 @@
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.5
 #define MECHANTS               500
+#define VIRUS                  10
 #define GENTILS                30
-#define RATIOSPLITMULTI        1.3
+#define RATIOSPLITMULTI        2
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
 // call with: ./bot 127.0.0.1:1443      -s for solo
@@ -169,6 +170,7 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 		infos.intensiteAureole = INTENSITEAUREOLE;
 		infos.intensiteAureoleBords = INTENSITEAUREOLEBORDS;
 		infos.mechants = MECHANTS;
+		infos.virus = VIRUS;
 		infos.gentils = GENTILS;
 		infos.ratioSplitMulti = RATIOSPLITMULTI;
 
@@ -242,19 +244,19 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 int main(int argc, char **argv)
 {
 	// On initialise la fenetre de vision
-    if(0 != init(&window, &renderer, 640, 480)) goto Quit;
+    if(0 != init(&window, &renderer, 640, 530)) goto Quit;
 	SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
 	SDL_SetWindowTitle(window, "Vision du Lechbot");
 	SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
 
 	// On initialise la fenetre de densité
-	if(0 != init(&densiteWindow, &densiteRenderer, 500, 480)) goto Quit;
+	if(0 != init(&densiteWindow, &densiteRenderer, 500, 530)) goto Quit;
 	SDL_SetRenderDrawColor(densiteRenderer, 245, 245, 245, 255);
 	SDL_SetWindowTitle(densiteWindow, "Densite");
 
 	// On initialise la fenetre de settings
-	if(0 != init(&settings, &settingsRenderer, 300, 480)) goto Quit;
+	if(0 != init(&settings, &settingsRenderer, 300, 530)) goto Quit;
 	SDL_SetRenderDrawColor(settingsRenderer, 200, 200, 200, 255);
 	SDL_SetWindowTitle(settings, "Parametres du Lechbot");
 	SDL_RenderClear(settingsRenderer);

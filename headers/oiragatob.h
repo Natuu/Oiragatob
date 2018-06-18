@@ -51,6 +51,7 @@ typedef struct infos{
 	float nombreSplit;
 	float intensiteAureole;
 	float intensiteAureoleBords;
+	float virus;
 	float mechants;
 	float gentils;
 	float ratioSplitMulti;

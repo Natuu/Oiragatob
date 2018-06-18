@@ -20,13 +20,14 @@ void afficherSettings(Infos *infos) {
 
 	// On set nos curseurs
 	float curseurDistance = infos -> distanceCoeff / 2000;
-	float curseurRatioSplitMulti = infos -> ratioSplitMulti / 2;
+	float curseurRatioSplitMulti = infos -> ratioSplitMulti / 3;
 	float curseurAureolage = infos -> aureolage / 50;
 	float curseurRepulsionBords = infos -> repulsionBords / 100;
 	float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
 	float curseurNombreSplit = infos -> nombreSplit / 16;
 	float curseurGentils = infos -> gentils / 50;
 	float curseurMechants = infos -> mechants / 1000;
+	float curseurVirus = infos -> virus / 50;
 
 	char toWrite[50];
 
@@ -54,6 +55,9 @@ void afficherSettings(Infos *infos) {
 
 	sprintf(toWrite, "Méchants : %d", (int)infos -> mechants);
 	creerCurseur(20, 37 + 57 * 7, curseurMechants, toWrite);
+
+	sprintf(toWrite, "Virus : %d", (int)infos -> virus);
+	creerCurseur(20, 37 + 57 * 8, curseurVirus, toWrite);
 
 	// Afficher les settings
 	SDL_RenderPresent(settingsRenderer);
@@ -215,7 +219,7 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 	// ratioSplitMulti
 	else if (y > 37 + 57 * 1 && y < 57 + 57 * 1) {
 		if (x > 0 && x < 260) {
-			infos -> ratioSplitMulti = (x / 260.0) * 2;
+			infos -> ratioSplitMulti = (x / 260.0) * 3;
 		}
 	}
 	// aureolage
@@ -252,6 +256,12 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 	else if (y > 37 + 57 * 7 && y < 57 + 57 * 7) {
 		if (x > 0 && x < 260) {
 			infos -> mechants = (x / 260.0) * 1000;
+		}
+	}
+	// virus
+	else if (y > 37 + 57 * 8 && y < 57 + 57 * 8) {
+		if (x > 0 && x < 260) {
+			infos -> virus = (x / 260.0) * 50;
 		}
 	}
 
@@ -362,16 +372,16 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
     // Si virus mais ignorer les vius
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && !virus) {
-        if (infos -> taille > 1.4 * cellVivante.taille) {
-            attrait = -1;
+        if (infos -> plusPetiteTaille * infos -> plusPetiteTaille > 1.31 * cellVivante.taille * cellVivante.taille) {
+            attrait = -infos ->  virus;
         }
 		// A l'envers litlle indian
 		color = 0xFF40E600;
     }
     // Si virus
     else if ((cellVivante.flag & 1) == 1 && (cellVivante.flag & 8) == 0 && virus) {
-        if (infos -> taille > 1.4 * cellVivante.taille) {
-            attrait = 1;
+        if (infos -> plusPetiteTaille * infos -> plusPetiteTaille > 1.31 * cellVivante.taille * cellVivante.taille) {
+            attrait = infos ->  virus;
         }
 		// A l'envers litlle indian
 		color = 0xFF40E600;
