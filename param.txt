@@ -28,3 +28,48 @@ virus = 41.000000
 
  --------- 
 
+Score 170 
+
+Distance = 828.000000 
+ratioSplitMulti = 2.000000 
+aureolage = 2.000000 
+repulsionBords = 77.000000 
+intensiteAureole = 0.020000 
+nombreSplit = 1.000000 
+gentils = 30.000000 
+mechants = 33.000000 
+virus = 24.000000 
+
+
+ --------- 
+
+Score 138 
+
+Distance = 1469.000000 
+ratioSplitMulti = 5.000000 
+aureolage = 7.000000 
+repulsionBords = 29.000000 
+intensiteAureole = 0.110000 
+nombreSplit = 0.000000 
+gentils = 17.000000 
+mechants = 34.000000 
+virus = 11.000000 
+
+
+ --------- 
+
+Score 151 
+
+Distance = 1743.000000 
+ratioSplitMulti = 4.000000 
+aureolage = 22.000000 
+repulsionBords = 35.000000 
+intensiteAureole = 0.050000 
+nombreSplit = 4.000000 
+gentils = 33.000000 
+mechants = 17.000000 
+virus = 44.000000 
+
+
+ --------- 
+
