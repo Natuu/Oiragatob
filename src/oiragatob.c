@@ -611,7 +611,7 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
 }
 
 // Fonction principale
-void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
+void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit){
 
     // Position (jamais reçu)
     if (recu[0] == 17) {
@@ -800,9 +800,14 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 	else printf("Paquet inconnu d'OPCODE %d\n", recu[0]);
 
 	// On vérifie si les curseurs ont changé
-	if (SDL_PollEvent(&event)) {
+	while(SDL_PollEvent(&event)) {
 		if(event.type == SDL_MOUSEBUTTONUP) {
 			getCurseurValeur(infos, event.button.x, event.button.y);
+		}
+		if(event.type == SDL_WINDOWEVENT) {
+			if(event.window.event == SDL_WINDOWEVENT_CLOSE) {
+				*forceExit = 1;
+			}
 		}
 	}
 

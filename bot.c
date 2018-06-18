@@ -204,17 +204,9 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 
 				Buffer command;
 				command.buf = malloc(sizeof(unsigned char));
-				oiragatob(rbuf, &command, &infos);
+				oiragatob(rbuf, &command, &infos, &forceExit);
 				sendCommand(wsi, command.buf, command.len);
 				free(command.buf);
-
-				if (SDL_PollEvent(&event)) {
-					if(event.type == SDL_WINDOWEVENT) {
-		        		if(event.window.event == SDL_WINDOWEVENT_CLOSE) {
-							forceExit = 1;
-						}
-					}
-				}
 
 				offset=0;
 			}

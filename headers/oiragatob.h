@@ -69,7 +69,7 @@ int tailleInWindow(int taille, Infos *infos, int largeur);
 
 void getCurseurValeur(Infos *infos, int x, int y);
 
-void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos);
+void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit);
 
 int valeurPaquet (int indiceDepart, int longueurPaquet, unsigned char *paquet);
 
