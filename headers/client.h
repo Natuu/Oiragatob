@@ -6,6 +6,8 @@
 
 extern SDL_Window *window;
 extern SDL_Renderer *renderer;
+extern SDL_Window *densiteWindow;
+extern SDL_Renderer *densiteRenderer;
 extern SDL_Window *settings;
 extern SDL_Renderer *settingsRenderer;
 extern SDL_Event event;

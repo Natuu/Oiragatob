@@ -16,6 +16,110 @@
 #include "../headers/client.h"
 
 
+// Affichage des settings
+void afficherSettings(Infos *infos) {
+
+	// On set nos curseurs
+	float curseurDistance = infos -> distanceCoeff / 2000;
+	float curseurRatioSplitMulti = infos -> ratioSplitMulti / 2;
+	float curseurAureolage = infos -> aureolage / 50;
+	float curseurRepulsionBords = infos -> repulsionBords / 100;
+	float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
+	float curseurNombreSplit = infos -> nombreSplit / 16;
+	float curseurGentils = infos -> gentils / 50;
+	float curseurMechants = infos -> mechants / 10000;
+
+	char toWrite[50];
+
+	// On affiche les settings
+	sprintf(toWrite, "Distance : %d", (int)infos -> distanceCoeff);
+	creerCurseur(20, 37, curseurDistance, toWrite);
+
+	sprintf(toWrite, "Ratio Split : %d", (int)(infos -> ratioSplitMulti * 100));
+	creerCurseur(20, 37 + 57 * 1, curseurRatioSplitMulti, toWrite);
+
+	sprintf(toWrite, "Auréolage : %d", (int)infos -> aureolage);
+	creerCurseur(20, 37 + 57 * 2, curseurAureolage, toWrite);
+
+	sprintf(toWrite, "Repulsion Bords : %d", (int)infos -> repulsionBords);
+	creerCurseur(20, 37 + 57 * 3, curseurRepulsionBords, toWrite);
+
+	sprintf(toWrite, "Intensité Auréole : %d", (int)(infos -> intensiteAureole * 100));
+	creerCurseur(20, 37 + 57 * 4, curseurIntensiteAureole, toWrite);
+
+	sprintf(toWrite, "Nombre split : %d", (int)infos -> nombreSplit);
+	creerCurseur(20, 37 + 57 * 5, curseurNombreSplit, toWrite);
+
+	sprintf(toWrite, "Gentils : %d", (int)infos -> gentils);
+	creerCurseur(20, 37 + 57 * 6, curseurGentils, toWrite);
+
+	sprintf(toWrite, "Méchants : %d", (int)infos -> mechants);
+	creerCurseur(20, 37 + 57 * 7, curseurMechants, toWrite);
+
+	SDL_RenderPresent(settingsRenderer);
+	SDL_SetRenderDrawColor(settingsRenderer, 60, 60, 60, 255);
+	SDL_RenderClear(settingsRenderer);
+}
+
+// Affichage de la densité
+void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **densite) {
+
+	int i;
+	int j;
+
+	// Calcul des zones hors champ de vision
+	int nombreZonesNonVisiblesH = infos -> visibleH / (infos->plusPetiteTaille * infos -> resolution);
+	int nombreZonesNonVisiblesB = (infos -> carteB - infos -> visibleB) / (infos->plusPetiteTaille * infos -> resolution);
+	int nombreZonesNonVisiblesG = infos -> visibleG / (infos->plusPetiteTaille * infos -> resolution);
+	int nombreZonesNonVisiblesD = (infos -> carteD - infos -> visibleD) / (infos->plusPetiteTaille * infos -> resolution);
+
+	// Calcul des zones dans le champ de vision
+	int nombreZonesVisiblesX = nombreZonesX - nombreZonesNonVisiblesD - nombreZonesNonVisiblesG;
+	int nombreZonesVisiblesY = nombreZonesY - nombreZonesNonVisiblesB - nombreZonesNonVisiblesH;
+
+	// Calcul de l'id de la dernière zone visible
+	int idNombreZonesVisibleX = nombreZonesVisiblesX + nombreZonesNonVisiblesG;
+	int idNombreZonesVisibleY = nombreZonesVisiblesY + nombreZonesNonVisiblesH;
+
+	// On évite les segfault
+	if (idNombreZonesVisibleX > nombreZonesX) idNombreZonesVisibleX = nombreZonesX;
+	if (idNombreZonesVisibleY > nombreZonesY) idNombreZonesVisibleY = nombreZonesY;
+
+	// Calcul de la taille relative des zones
+	int *windowHauteur = malloc(sizeof(int));
+	int *windowLargeur = malloc(sizeof(int));
+	SDL_GetWindowSize(densiteWindow, windowLargeur, windowHauteur);
+
+	int tailleZoneX = *windowLargeur / nombreZonesVisiblesX;
+	int tailleZoneY = tailleZoneX;
+
+	free(windowHauteur);
+	free(windowLargeur);
+
+	if(tailleZoneX < 1) tailleZoneX = 1;
+	if(tailleZoneY < 1) tailleZoneY = 1;
+	if(tailleZoneX > 3) tailleZoneX = 3;
+	if(tailleZoneY > 3) tailleZoneY = 3;
+
+	// Remplissage visuel des zones
+	SDL_Rect zone = {0, 0, tailleZoneX, tailleZoneY};
+	for (i = nombreZonesNonVisiblesH; i < idNombreZonesVisibleY; i++) {
+		for (j = nombreZonesNonVisiblesG; j < idNombreZonesVisibleX; j++) {
+
+			zone.x = tailleZoneX * (j - nombreZonesNonVisiblesG);
+			zone.y = tailleZoneY * (i - nombreZonesNonVisiblesH);
+
+			if (densite[i][j] > 0) {
+				SDL_SetRenderDrawColor(densiteRenderer, 230 - densite[i][j] *100 * 50, 230, 230 - densite[i][j] *100 * 50, 255);
+			}
+			else {
+				SDL_SetRenderDrawColor(densiteRenderer, 230, 230 - densite[i][j] *100 * 50, 230 - densite[i][j] *100 * 50, 255);
+			}
+			SDL_RenderFillRect(densiteRenderer, &zone);
+		}
+	}
+}
+
 // Donne la position dans la fenetre d'affichage
 void posInWindow(int *x, int *y, Infos *infos){
 
@@ -31,11 +135,16 @@ void posInWindow(int *x, int *y, Infos *infos){
 }
 
 // Donne la taille dans la fenetre d'affichage
-int tailleInWindow(int taille, Infos *infos) {
+int tailleInWindow(int taille, Infos *infos, int largeur) {
 	int *windowHauteur = malloc(sizeof(int));
 	int *windowLargeur = malloc(sizeof(int));
 	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
-	taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
+	if (largeur) {
+		taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
+	}
+	else {
+		taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowHauteur;
+	}
 
 	free(windowHauteur);
 	free(windowLargeur);
@@ -46,14 +155,18 @@ int tailleInWindow(int taille, Infos *infos) {
 // Crée les curseurs de settings
 void creerCurseur(int x, int y, float curseurX, char *toWrite) {
 
-	SDL_Rect rect = {x, y, 260, 20};
+	SDL_Rect rect = {x, y, 260, 23};
 
 	SDL_SetRenderDrawColor(settingsRenderer, 150, 150, 150, 255);
 	SDL_RenderFillRect(settingsRenderer, &rect);
-	filledCircleColor(settingsRenderer, x, y + 10, 10, 0xFF969696);
-	filledCircleColor(settingsRenderer, x + 259, y + 10, 10, 0xFF969696);
+	filledCircleColor(settingsRenderer, x, y + 11, 11, 0xFF66E600);
+	filledCircleColor(settingsRenderer, x + 259, y + 11, 11, 0xFF969696);
 
-	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 10, 14, 0xFFEEEEEE);
+	SDL_Rect prog = {x, y, 260 * curseurX, 23};
+	SDL_SetRenderDrawColor(settingsRenderer, 0, 0xE6, 0x66, 255);
+	SDL_RenderFillRect(settingsRenderer, &prog);
+
+	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 11, 14, 0xFFEEEEEE);
 
 	SDL_Color color;
 	color.r = 245;
@@ -284,7 +397,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
 
 	// On affiche la cellule
-	filledCircleColor(renderer, *x, *y, tailleInWindow(cellVivante.taille, infos), color);
+	filledCircleColor(renderer, *x, *y, tailleInWindow(cellVivante.taille, infos, 1), color);
 
 	free(x);
 	free(y);
@@ -294,8 +407,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
         for (j = -nbCases; j <= nbCases; j++) {
 
             // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
-            for (k = -tailleAureole; k < tailleAureole; k++) {
-                for (l =  -tailleAureole; l <  tailleAureole; l++) {
+            for (k = -tailleAureole; k <= tailleAureole; k++) {
+                for (l =  -tailleAureole; l <=  tailleAureole; l++) {
 
                     // On évite le segfault...
                     if (zoneX + i + k < nombreZonesX && zoneY + j + l < nombreZonesY && zoneX + i + k >= 0 && zoneY + j + l >= 0) {
@@ -327,13 +440,13 @@ void aureoleBords(Infos *infos, int **densite, int nombreZonesX, int nombreZones
 
             if (i == 0 || j == 0 || i == nombreZonesY - 1 || j == nombreZonesX - 1) {
                 // Auréolage (on rempli la grille avec beaucoup de densité à la position de la cellule et un peu autour)
-                for (k = -tailleAureole; k < tailleAureole; k++) {
-                    for (l =  -tailleAureole; l <  tailleAureole; l++) {
+                for (k = -tailleAureole; k <= tailleAureole; k++) {
+                    for (l =  -tailleAureole; l <=  tailleAureole; l++) {
 
                         // On évite le segfault...
                         if (j + k < nombreZonesX && i + l < nombreZonesY && j + k >= 0 && i + l >= 0) {
                             distance = sqrt(k*k + l*l);
-                            // Cellule centrale 100 fois plus importante que celles juste autour
+                            // Cellule centrale intensiteAureoleBords fois plus importante que celles juste autour
                             if (distance == 0)   distance = infos -> intensiteAureoleBords;
                             densite[i + l][j + k] -= repulsion / distance;
                         }
@@ -500,14 +613,14 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
 // Fonction principale
 void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
-    // Position
+    // Position (jamais reçu)
     if (recu[0] == 17) {
 
         infos->posX = valeurPaquet(1, 4, recu);
         infos->posY = valeurPaquet(5, 4, recu);
         infos->taille = valeurPaquet(9, 4, recu);
 
-        printf("PosX    : %d\nPosY    : %d\nTaille  : %d\n", infos->posX, infos->posY, infos->taille);
+        // printf("PosX    : %d\nPosY    : %d\nTaille  : %d\n", infos->posX, infos->posY, infos->taille);
     }
 
     // Vider cellules
@@ -534,7 +647,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
             infos->cellules[i].id = aAjouter;
         }
         // else {
-        //   printf("Pas d'ajout ??!!?");
+        //   printf("Pas d'ajout");
         // }
 
     }
@@ -614,6 +727,9 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
             }
         }
 
+		// On auréole les bords
+		aureoleBords(infos, densite, nombreZonesX, nombreZonesY, infos -> repulsionBords, infos -> aureolage);
+
         // Nombre de cellules mortes
         cellMort = valeurPaquet(1, 2, recu);
 
@@ -626,12 +742,12 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
             }
         }
 
-        Cellule cellVivante;
-
         // Tri du buffer
         int parcourCell = 3 + cellMort * 8;
 
         // Traitement des cellules une à une
+		Cellule cellVivante;
+
         while (recu[parcourCell] + recu[parcourCell + 1] + recu[parcourCell + 2] + recu[parcourCell + 3] != 0){
 
             cellVivante.id = valeurPaquet(parcourCell, 4, recu);
@@ -654,74 +770,26 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
 
 		// On affiche la vision
 		SDL_RenderPresent(renderer);
-		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_RenderClear(renderer);
 
-
-		SDL_SetRenderDrawBlendMode(settingsRenderer, SDL_BLENDMODE_BLEND);
-
-		// On vérifie si les curseurs ont changé
-		if (SDL_PollEvent(&event)) {
-			if(event.type == SDL_MOUSEBUTTONUP) {
-		        getCurseurValeur(infos, event.button.x, event.button.y);
-		    }
-		}
-
-		// On set nos curseurs
-		float curseurDistance = infos -> distanceCoeff / 2000;
-		float curseurRatioSplitMulti = infos -> ratioSplitMulti / 2;
-		float curseurAureolage = infos -> aureolage / 50;
-		float curseurRepulsionBords = infos -> repulsionBords / 100;
-		float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
-		float curseurNombreSplit = infos -> nombreSplit / 16;
-		float curseurGentils = infos -> gentils / 50;
-		float curseurMechants = infos -> mechants / 10000;
-
-		char toWrite[50];
-
-		// On affiche les settings
-		sprintf(toWrite, "Distance : %d", (int)infos -> distanceCoeff);
-		creerCurseur(20, 37, curseurDistance, toWrite);
-
-		sprintf(toWrite, "Ratio Split : %d", (int)(infos -> ratioSplitMulti * 100));
-		creerCurseur(20, 37 + 57 * 1, curseurRatioSplitMulti, toWrite);
-
-		sprintf(toWrite, "Auréolage : %d", (int)infos -> aureolage);
-		creerCurseur(20, 37 + 57 * 2, curseurAureolage, toWrite);
-
-		sprintf(toWrite, "Repulsion Bords : %d", (int)infos -> repulsionBords);
-		creerCurseur(20, 37 + 57 * 3, curseurRepulsionBords, toWrite);
-
-		sprintf(toWrite, "Intensité Auréole : %d", (int)(infos -> intensiteAureole * 100));
-		creerCurseur(20, 37 + 57 * 4, curseurIntensiteAureole, toWrite);
-
-		sprintf(toWrite, "Nombre split : %d", (int)infos -> nombreSplit);
-		creerCurseur(20, 37 + 57 * 5, curseurNombreSplit, toWrite);
-
-		sprintf(toWrite, "Gentils : %d", (int)infos -> gentils);
-		creerCurseur(20, 37 + 57 * 6, curseurGentils, toWrite);
-
-		sprintf(toWrite, "Méchants : %d", (int)infos -> mechants);
-		creerCurseur(20, 37 + 57 * 7, curseurMechants, toWrite);
-
-		SDL_RenderPresent(settingsRenderer);
-		SDL_SetRenderDrawColor(settingsRenderer, 60, 60, 60, 255);
-		SDL_RenderClear(settingsRenderer);
-
-        aureoleBords(infos, densite, nombreZonesX, nombreZonesY, infos -> repulsionBords, infos -> aureolage);
+		// On affiche la densité
+		afficherDensite(infos, nombreZonesX, nombreZonesY, densite);
+		SDL_RenderPresent(densiteRenderer);
+		SDL_SetRenderDrawColor(densiteRenderer, 255, 255, 255, 255);
+		SDL_RenderClear(densiteRenderer);
 
         // On se dirige ou on se splitte
         pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
 
+		// On libère le tableau de densité
         for (i = 0; i < nombreZonesY; i++) {
             free(densite[i]);
         }
         free(densite);
 
+		// On envoie notre paquet
         creerPaquetDeplacement(envoi, infos);
-        // printf("paquet %s\n", envoi);
-
     }
 
     // Scores
@@ -729,7 +797,18 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos){
         // Score
     }
 
+	else printf("Paquet inconnu d'OPCODE %d\n", recu[0]);
 
-    else printf("Paquet inconnu d'OPCODE %d\n", recu[0]);
+	// On vérifie si les curseurs ont changé
+	if (SDL_PollEvent(&event)) {
+		if(event.type == SDL_MOUSEBUTTONUP) {
+			getCurseurValeur(infos, event.button.x, event.button.y);
+		}
+	}
+
+	// On affiche les settings
+	afficherSettings(infos);
+
+
 
 }
