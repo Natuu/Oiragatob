@@ -21,13 +21,13 @@
 #define RESOLUTION             0.4
 #define REPULSIONBORDS         8
 #define DISTANCEVISE           12
-#define AUREOLAGE              10
+#define AUREOLAGE              20
 #define TAILLECOEFF            1000
-#define TAILLESPLIT            80
+#define TAILLESPLIT            75
 #define NOMBRESPLIT            3
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.5
-#define MECHANTS               4000
+#define MECHANTS               500
 #define GENTILS                30
 #define RATIOSPLITMULTI        1.3
 

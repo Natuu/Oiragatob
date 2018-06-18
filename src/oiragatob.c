@@ -26,7 +26,7 @@ void afficherSettings(Infos *infos) {
 	float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
 	float curseurNombreSplit = infos -> nombreSplit / 16;
 	float curseurGentils = infos -> gentils / 50;
-	float curseurMechants = infos -> mechants / 10000;
+	float curseurMechants = infos -> mechants / 1000;
 
 	char toWrite[50];
 
@@ -251,7 +251,7 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 	// mechants
 	else if (y > 37 + 57 * 7 && y < 57 + 57 * 7) {
 		if (x > 0 && x < 260) {
-			infos -> mechants = (x / 260.0) * 10000;
+			infos -> mechants = (x / 260.0) * 1000;
 		}
 	}
 
@@ -379,7 +379,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Si méchant
     else if (ennemis)
     {
-        if (infos -> plusPetiteTaille > 1.4 * cellVivante.taille) {
+		// Comparaison de masse
+        if (infos -> plusPetiteTaille * infos -> plusPetiteTaille > 1.31 * cellVivante.taille * cellVivante.taille) {
             attrait = infos -> gentils;
 			// A l'envers litlle indian
 			color = 0xFF18CAF7;
@@ -487,6 +488,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
     infos -> plusPetiteTaille = 999999;
     int nombreSplit = 0;
     int bestDensite = 0;
+	int bestDistance = 0;
 
     for (k = 0; k < 30; k++) {
 
@@ -526,6 +528,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 						// On enregistre la cellule pilote
                         bestRatio = ratio;
                         bestDensite = densite[i][j];
+						bestDistance = distance;
                         infos -> taille = infos -> cellules[k].taille;
                         infos -> posX = infos -> cellules[k].x;
                         infos -> posY = infos -> cellules[k].y;
@@ -550,7 +553,7 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
         infos -> split = 1;
     }
 	// On splitte si on est en multi et que la zone visée est très intéressante (ratioSplitMulti)
-    else if (!infos -> solo && bestDensite * infos -> intensiteAureole > infos -> taille * infos -> ratioSplitMulti * infos -> gentils && infos -> taille > infos -> tailleSplit && nombreSplit < infos -> nombreSplit) {
+    else if (!infos -> solo && bestDensite > 0 && bestDensite * bestDensite * infos -> intensiteAureole * infos -> intensiteAureole> infos -> taille * infos -> taille * infos -> ratioSplitMulti * infos -> gentils && infos -> taille > infos -> tailleSplit && nombreSplit < infos -> nombreSplit && bestDistance < 300) {
         infos -> split = 1;
     }
 
