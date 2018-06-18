@@ -776,7 +776,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
 		// On affiche la densité
 		afficherDensite(infos, nombreZonesX, nombreZonesY, densite);
 		SDL_RenderPresent(densiteRenderer);
-		SDL_SetRenderDrawColor(densiteRenderer, 255, 255, 255, 255);
+		SDL_SetRenderDrawColor(densiteRenderer, 60, 60, 60, 255);
 		SDL_RenderClear(densiteRenderer);
 
         // On se dirige ou on se splitte
