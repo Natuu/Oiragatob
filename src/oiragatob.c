@@ -420,9 +420,11 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
 
 	// On affiche la cellule
-	int tailleAffichage = tailleInWindow(cellVivante.taille, infos, 1);
-	if (tailleAffichage < 1) tailleAffichage = 1;
-	filledCircleColor(renderer, *x, *y, tailleInWindow(cellVivante.taille, infos, 1), color);
+	int tailleAffichageX = tailleInWindow(cellVivante.taille, infos, 1);
+	int tailleAffichageY = tailleInWindow(cellVivante.taille, infos, 0);
+	if (tailleAffichageX < 1) tailleAffichageX = 1;
+	if (tailleAffichageY < 1) tailleAffichageY = 1;
+	filledEllipseColor(renderer, *x, *y, tailleAffichageX, tailleAffichageY, color);
 
 	free(x);
 	free(y);
