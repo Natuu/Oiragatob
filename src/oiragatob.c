@@ -12,11 +12,10 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "../headers/oiragatob.h"
-#include "../headers/sdlFonctions.h"
 #include "../headers/client.h"
 
 
-// Affichage des settings
+// Affiche les settings
 void afficherSettings(Infos *infos) {
 
 	// On set nos curseurs
@@ -31,7 +30,7 @@ void afficherSettings(Infos *infos) {
 
 	char toWrite[50];
 
-	// On affiche les settings
+	// On crée les curseurs et le texte
 	sprintf(toWrite, "Distance : %d", (int)infos -> distanceCoeff);
 	creerCurseur(20, 37, curseurDistance, toWrite);
 
@@ -56,12 +55,13 @@ void afficherSettings(Infos *infos) {
 	sprintf(toWrite, "Méchants : %d", (int)infos -> mechants);
 	creerCurseur(20, 37 + 57 * 7, curseurMechants, toWrite);
 
+	// Afficher les settings
 	SDL_RenderPresent(settingsRenderer);
 	SDL_SetRenderDrawColor(settingsRenderer, 60, 60, 60, 255);
 	SDL_RenderClear(settingsRenderer);
 }
 
-// Affichage de la densité
+// Affiche la densité
 void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **densite) {
 
 	int i;
@@ -85,7 +85,7 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 	if (idNombreZonesVisibleX > nombreZonesX) idNombreZonesVisibleX = nombreZonesX;
 	if (idNombreZonesVisibleY > nombreZonesY) idNombreZonesVisibleY = nombreZonesY;
 
-	// Calcul de la taille relative des zones
+	// Calcul de la taille relative des zones à l'affichage
 	int *windowHauteur = malloc(sizeof(int));
 	int *windowLargeur = malloc(sizeof(int));
 	SDL_GetWindowSize(densiteWindow, windowLargeur, windowHauteur);
@@ -110,14 +110,19 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 			zone.y = tailleZoneY * (i - nombreZonesNonVisiblesH);
 
 			if (densite[i][j] > 0) {
-				SDL_SetRenderDrawColor(densiteRenderer, 230 - densite[i][j] *100 * 50, 230, 230 - densite[i][j] *100 * 50, 255);
+				SDL_SetRenderDrawColor(densiteRenderer, 230 - densite[i][j] *5000, 230, 230 - densite[i][j] *5000, 255);
 			}
 			else {
-				SDL_SetRenderDrawColor(densiteRenderer, 230, 230 - densite[i][j] *100 * 50, 230 - densite[i][j] *100 * 50, 255);
+				SDL_SetRenderDrawColor(densiteRenderer, 230, 230 - densite[i][j] *5000, 230 - densite[i][j] *5000, 255);
 			}
 			SDL_RenderFillRect(densiteRenderer, &zone);
 		}
 	}
+
+	// On affiche la densité
+	SDL_RenderPresent(densiteRenderer);
+	SDL_SetRenderDrawColor(densiteRenderer, 60, 60, 60, 255);
+	SDL_RenderClear(densiteRenderer);
 }
 
 // Donne la position dans la fenetre d'affichage
@@ -155,19 +160,24 @@ int tailleInWindow(int taille, Infos *infos, int largeur) {
 // Crée les curseurs de settings
 void creerCurseur(int x, int y, float curseurX, char *toWrite) {
 
+	// Barre de fond
 	SDL_Rect rect = {x, y, 260, 23};
-
 	SDL_SetRenderDrawColor(settingsRenderer, 150, 150, 150, 255);
 	SDL_RenderFillRect(settingsRenderer, &rect);
+
+	// Bords ronds
 	filledCircleColor(settingsRenderer, x, y + 11, 11, 0xFF66E600);
 	filledCircleColor(settingsRenderer, x + 259, y + 11, 11, 0xFF969696);
 
+	// Progression
 	SDL_Rect prog = {x, y, 260 * curseurX, 23};
 	SDL_SetRenderDrawColor(settingsRenderer, 0, 0xE6, 0x66, 255);
 	SDL_RenderFillRect(settingsRenderer, &prog);
 
+	// Curseur
 	filledCircleColor(settingsRenderer, x + 260 * curseurX, y + 11, 14, 0xFFEEEEEE);
 
+	// Texte
 	SDL_Color color;
 	color.r = 245;
 	color.g = 245;
@@ -191,9 +201,10 @@ void creerCurseur(int x, int y, float curseurX, char *toWrite) {
 // Réccupère la valeur du curseur en cas de clic dse la souris
 void getCurseurValeur(Infos *infos, int x, int y) {
 
+	// On gere l'offset sur x
 	x -= 20;
 
-	// On actualise la valeur en fonction des parametres
+	// On actualise la valeur de la position du curseur en % en fonction des parametres
 
 	// distanceCoeff
 	if (y > 37 && y < 57) {
@@ -313,13 +324,13 @@ void assemblerPaquets(unsigned char *paquet1, int longueurPaquet1, unsigned char
     for (i = 0; i < longueurPaquet1; i++) {
         paquet[i] = paquet1[i];
     }
-    // Cause du seg Fault !!!!!!!!
+
     for (i = longueurPaquet1; i < longueurPaquet1 + longueurPaquet2; i++) {
         paquet[i] = paquet2[i - longueurPaquet1];
     }
 }
 
-// Remplis la grille de densité
+// Remplir la grille de densité
 void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX, int nombreZonesY, int tailleAureole, int food, int ennemis, int virus) {
     int i;
     int j;
@@ -346,7 +357,6 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     // Si food
     if ((cellVivante.flag & 1) == 0 && (cellVivante.flag & 8) == 0 && food) {
         attrait = 1;
-
 		// A l'envers litlle indian
 		color = 0xFF0694F8;
     }
@@ -498,10 +508,12 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
             for (i = 0; i < nombreZonesY; i++) {
                 for (j = 0; j < nombreZonesX; j++) {
 
+					// On calcule la distance
                     distanceX = (tailleZoneX * j + 0.5 * tailleZoneX) - posX;
                     distanceY = (tailleZoneY * i + 0.5 * tailleZoneY) - posY;
                     distance = sqrt((distanceX * distanceX) + (distanceY * distanceY));
 
+					// On calcule le ratio en ne divisant pas par 0
                     if (distance != 0) {
     					ratio = densite[i][j] * infos -> densiteCoeff / ((infos -> distanceCoeff * distance) + (infos -> cellules[k].taille * infos -> tailleCoeff));
     				}
@@ -511,15 +523,18 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
 
                     // On selectionne la meilleure cellule et on pointe vers la cellule (pointeur infos -> distanceVise fois plus loin)
                     if (ratio > bestRatio) {
+						// On enregistre la cellule pilote
                         bestRatio = ratio;
                         bestDensite = densite[i][j];
                         infos -> taille = infos -> cellules[k].taille;
                         infos -> posX = infos -> cellules[k].x;
                         infos -> posY = infos -> cellules[k].y;
 
+						// On enregistre la position de la souris en visant plus loin
                         infos -> sourisX = (int)(posX + infos -> distanceVise * (tailleZoneX * j + 0.5 * tailleZoneX - posX));
                         infos -> sourisY = (int)(posY + infos -> distanceVise * (tailleZoneY * i + 0.5 * tailleZoneY - posY));
 
+						// On s'assure de pointer une position de la carte
                         if (infos -> sourisX <= 0) infos -> sourisX = 1;
                         if (infos -> sourisY <= 0) infos -> sourisY = 1;
                         if (infos -> sourisX >= infos -> carteD) infos -> sourisX = infos -> carteD;
@@ -530,24 +545,29 @@ void pointerVersPosition (Infos *infos, int nombreZonesX, int nombreZonesY, int 
         }
     }
 
+	// On splitte si on est en solo et qu'on a pas atteint le nombre de split maximal
     if (infos -> solo && infos -> plusGrosseTaille > infos -> tailleSplit && nombreSplit < infos -> nombreSplit) {
         infos -> split = 1;
     }
+	// On splitte si on est en multi et que la zone visée est très intéressante (ratioSplitMulti)
     else if (!infos -> solo && bestDensite * infos -> intensiteAureole > infos -> taille * infos -> ratioSplitMulti * infos -> gentils && infos -> taille > infos -> tailleSplit && nombreSplit < infos -> nombreSplit) {
         infos -> split = 1;
     }
 
-    // Si environnement vide, on va ailleurs
+    // Si environnement vide, on va ailleurs (9 points sur la map à atteindre)
     if (bestRatio == 0) {
+		// On chosit le point suivant dès qu'on s'approche d'un des points
         if ((infos -> posX >= infos -> viserX[infos -> atteintViser] - 500 && infos -> posX <= infos -> viserX[infos -> atteintViser] + 500) && (infos -> posY >= infos -> viserY[infos -> atteintViser] - 500 && infos -> posY <= infos -> viserY[infos -> atteintViser] + 500))
         {
             infos -> atteintViser ++;
             infos -> atteintViser %= 9;
         }
+		// On vise
         infos -> sourisX = infos -> viserX[infos -> atteintViser];
         infos -> sourisY = infos -> viserY[infos -> atteintViser];
     }
 
+	// On affiche dans la console la position de la cellule pilote et la position de la souris
     //printf("From : %d, %d\nTo   : %d, %d\n",infos -> posX, infos -> posY, infos -> sourisX, infos -> sourisY);
 }
 
@@ -560,6 +580,7 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
         if (0 != infos->cellules[i].id) nombreCellules ++;
     }
 
+	// On s'assure de pouvoir split (double vérification pour plus de sureté)
     if (infos -> split == 1 && nombreCellules < 16){
         envoi -> len = 1;
         free(envoi -> buf);
@@ -570,7 +591,7 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
         // Envoi du paquet
         envoi -> len = 13;
 
-        // Envoi du paquet
+        // Création du paquet
         unsigned char *idPaquet;
         idPaquet = malloc(sizeof(unsigned char) * 1);
         unsigned char *xPaquet;
@@ -584,21 +605,22 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
         paquetValeur(4, infos->sourisY, yPaquet);
         paquetValeur(4, 0, uselessPaquet);
 
-        //Initialisation du pointeur
+        // Initialisation du pointeur vers le buffer
         free(envoi -> buf);
         envoi -> buf = malloc(envoi -> len * sizeof(unsigned char));
 
+		// Assemblage du paquet
         unsigned char *paquetIntermediaire1;
         paquetIntermediaire1 = malloc(sizeof(unsigned char) * 5);
         assemblerPaquets(idPaquet, 1, xPaquet, 4, paquetIntermediaire1);
         unsigned char *paquetIntermediaire2;
         paquetIntermediaire2 = malloc(sizeof(unsigned char) * 9);
         assemblerPaquets(paquetIntermediaire1, 5, yPaquet, 4, paquetIntermediaire2);
-        // Derniers paquets
+        // Derniers paquets à assembler
         assemblerPaquets(paquetIntermediaire2, 9, uselessPaquet, 4, envoi -> buf);
 
+		// On affiche la position x et y envoyée dans le paquet
         //printf("xPaquet %d yPaquet %d\n\n",valeurPaquet (1, 4, envoi -> buf), valeurPaquet (5, 4, envoi -> buf));
-
 
         free(idPaquet);
         free(xPaquet);
@@ -613,17 +635,18 @@ void creerPaquetDeplacement (Buffer *envoi, Infos *infos){
 // Fonction principale
 void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit){
 
-    // Position (jamais reçu)
+    // Position (jamais reçu mais au cas où le serveur se perd, on sait ce qu'on reçoit)
     if (recu[0] == 17) {
 
         infos->posX = valeurPaquet(1, 4, recu);
         infos->posY = valeurPaquet(5, 4, recu);
         infos->taille = valeurPaquet(9, 4, recu);
 
+		// On affiche la position et la taille que le serveur nous envoie
         // printf("PosX    : %d\nPosY    : %d\nTaille  : %d\n", infos->posX, infos->posY, infos->taille);
     }
 
-    // Vider cellules
+    // Vider cellules contrôlées par le joueur
     else if (recu[0] == 18) {
 
         int i;
@@ -635,7 +658,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
         // printf("Plus de cellules controlées\n");
     }
 
-    // Ajout cellule
+    // Ajout cellule contrôlée par le joueur
     else if (recu[0] == 32) {
 
         int i = 0;
@@ -692,10 +715,11 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
         infos -> viserX[8] = infos->carteD / 2;
         infos -> viserY[8] = infos->carteB / 2;
 
+		// On affiche les bords recus
         // printf("Bord gauche  : %d\nBord droit   : %d\nBord haut    : %d\nBord bas     : %d\n", infos->visibleG, infos->visibleD, infos->visibleH, infos->visibleB);
     }
 
-    // MAJ cellules
+    // Paquet update nodes
     else if (recu[0] == 16) {
 
         int cellMort;
@@ -713,18 +737,11 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
         nombreZonesX ++;
         nombreZonesY ++;
 
-        // Allocation de la mémoire de la densité
+        // Allocation de la mémoire de la densité et mise à 0
         int **densite;
         densite = malloc(sizeof(int*)*nombreZonesY);
         for (i = 0; i < nombreZonesY; i++) {
-            densite[i] = malloc(sizeof(int)*nombreZonesX);
-        }
-
-        // Mise à 0 de la densité
-        for (i = 0; i < nombreZonesY; i++) {
-            for (j = 0; j < nombreZonesX; j++) {
-                densite[i][j] = 0;
-            }
+            densite[i] = calloc(nombreZonesX, sizeof(int));
         }
 
 		// On auréole les bords
@@ -733,7 +750,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
         // Nombre de cellules mortes
         cellMort = valeurPaquet(1, 2, recu);
 
-        //Retirer nos cellules mortes
+        // Retirer nos cellules mortes des cellules pilotées
         for (i = 3; i < cellMort * 8 + 3; i += 8) {
             for (j = 0; j < 30; j++) {
                 if(valeurPaquet(i+4, 4, recu) == infos->cellules[j].id) {
@@ -764,20 +781,17 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
             }
 
             // Remplissage de la grille de densité
-            // On hydrate une fois sans virus ni ennemis et une fois avec
+            // On hydrate avec des mechants virus en multi et sans ennemis avec des gentils virus en solo
             hydrater(cellVivante, infos, densite, nombreZonesX, nombreZonesY, infos -> aureolage, 1, !infos -> solo, infos -> solo);
         }
 
-		// On affiche la vision
+		// On affiche la vision préremplie dans la fonction hydrater
 		SDL_RenderPresent(renderer);
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_RenderClear(renderer);
 
 		// On affiche la densité
 		afficherDensite(infos, nombreZonesX, nombreZonesY, densite);
-		SDL_RenderPresent(densiteRenderer);
-		SDL_SetRenderDrawColor(densiteRenderer, 60, 60, 60, 255);
-		SDL_RenderClear(densiteRenderer);
 
         // On se dirige ou on se splitte
         pointerVersPosition (infos, nombreZonesX, nombreZonesY, densite);
@@ -797,9 +811,10 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
         // Score
     }
 
+	// Paquet inconnu
 	else printf("Paquet inconnu d'OPCODE %d\n", recu[0]);
 
-	// On vérifie si les curseurs ont changé
+	// On vérifie si les curseurs ont changé et que la fenetre n'est pas fermée
 	while(SDL_PollEvent(&event)) {
 		if(event.type == SDL_MOUSEBUTTONUP) {
 			getCurseurValeur(infos, event.button.x, event.button.y);
@@ -813,7 +828,4 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
 
 	// On affiche les settings
 	afficherSettings(infos);
-
-
-
 }

@@ -6,7 +6,7 @@ bot: bin/bot.o bin/oiragatob.o bin/sdlFonctions.o
 bin/bot.o: bot.c headers/oiragatob.h headers/client.h headers/sdlFonctions.h bin
 	gcc -o bin/bot.o -c bot.c -g -Wall
 
-bin/oiragatob.o: src/oiragatob.c headers/oiragatob.h headers/sdlFonctions.h bin
+bin/oiragatob.o: src/oiragatob.c headers/oiragatob.h bin
 	gcc -o bin/oiragatob.o -c src/oiragatob.c -g -Wall
 
 bin/sdlFonctions.o : src/sdlFonctions.c headers/sdlFonctions.h bin

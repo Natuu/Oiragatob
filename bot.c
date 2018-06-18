@@ -32,7 +32,7 @@
 #define RATIOSPLITMULTI        1.3
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
-// call with: ./bot -o agar.io 127.0.0.1:1443
+// call with: ./bot 127.0.0.1:1443      -s for solo
 
 Infos infos;
 int i;
@@ -181,7 +181,7 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 		sendCommand(wsi, connexion2, 5);
 
 		// Choisir un nom
-		unsigned char nom[] = {0x00, 'L', 'e', 'c', 'h', 'b', 'o', 't', 0x00};
+		unsigned char nom[] = {0x00, 'L', 'e', 'c', 'h', 'B', 'o', 't', 0x00};
 		sendCommand(wsi, nom, 9);
 
 		break;
@@ -241,44 +241,26 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 /****************************************************************************************************************************/
 int main(int argc, char **argv)
 {
+	// On initialise la fenetre de vision
     if(0 != init(&window, &renderer, 640, 480)) goto Quit;
-	if(0 != SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255)) {
-		fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
-		goto Quit;
-	}
-
+	SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
 	SDL_SetWindowTitle(window, "Vision du Lechbot");
-
-	if(0 != init(&densiteWindow, &densiteRenderer, 500, 480)) goto Quit;
-	if(0 != SDL_SetRenderDrawColor(densiteRenderer, 245, 245, 245, 255)) {
-		fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
-		goto Quit;
-	}
-
-	SDL_SetWindowTitle(densiteWindow, "Densité");
-
-	if(0 != SDL_RenderClear(renderer)) {
-		fprintf(stderr, "Erreur SDL_RenderClear : %s", SDL_GetError());
-		goto Quit;
-	}
-
+	SDL_RenderClear(renderer);
     SDL_RenderPresent(renderer);
 
+	// On initialise la fenetre de densité
+	if(0 != init(&densiteWindow, &densiteRenderer, 500, 480)) goto Quit;
+	SDL_SetRenderDrawColor(densiteRenderer, 245, 245, 245, 255);
+	SDL_SetWindowTitle(densiteWindow, "Densite");
+
+	// On initialise la fenetre de settings
 	if(0 != init(&settings, &settingsRenderer, 300, 480)) goto Quit;
-	if(0 != SDL_SetRenderDrawColor(settingsRenderer, 200, 200, 200, 255)) {
-		fprintf(stderr, "Erreur SDL_SetRenderDrawColor : %s", SDL_GetError());
-		goto Quit;
-	}
-
+	SDL_SetRenderDrawColor(settingsRenderer, 200, 200, 200, 255);
 	SDL_SetWindowTitle(settings, "Parametres du Lechbot");
-
-	if(0 != SDL_RenderClear(settingsRenderer)) {
-		fprintf(stderr, "Erreur SDL_RenderClear : %s", SDL_GetError());
-		goto Quit;
-	}
-
+	SDL_RenderClear(settingsRenderer);
     SDL_RenderPresent(settingsRenderer);
 
+	// On déplace les fenetres
 	int *x = malloc(sizeof(int));
 	int *y = malloc(sizeof(int));
 
@@ -290,7 +272,7 @@ int main(int argc, char **argv)
 	free(x);
 	free(y);
 
-
+	// On réccupère les parametres de la ligne de commande
 	int n = 0;
 
 	struct lws_context_creation_info info;
@@ -308,12 +290,15 @@ int main(int argc, char **argv)
 	i.origin = "agar.io";
 
 	while (n >= 0) {
-		n = getopt(argc, argv, "hsp:P:o:");
+		n = getopt(argc, argv, "hsp:P");
 		if (n < 0)
 		continue;
 		switch (n) {
+
+			// On met solo à 1 si -s
 			case 's':
 			solo = 1;
+
 			break;
 			case 'p':
 			i.port = atoi(optarg);
@@ -367,6 +352,7 @@ int main(int argc, char **argv)
 		lws_service(context, 1000);
 	}
 
+	// On destroy les fenetres et renderer
 Quit:
 	if(NULL != renderer) SDL_DestroyRenderer(renderer);
 	if(NULL != window) SDL_DestroyWindow(window);
@@ -383,6 +369,6 @@ Quit:
 	return 0;
 
 	usage:
-	fprintf(stderr, "Usage: ogar-client -h -s -p <port> -P <proxy> -o <origin>  <server address> \n");
+	fprintf(stderr, "Usage: ogar-client -h -s -p <port> -P <proxy> <server address> \n");
 	return 1;
 }
