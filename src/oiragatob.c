@@ -26,7 +26,7 @@ void afficherSettings(Infos *infos) {
 	float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
 	float curseurNombreSplit = infos -> nombreSplit / 16;
 	float curseurGentils = infos -> gentils / 50;
-	float curseurMechants = infos -> mechants / 1000;
+	float curseurMechants = infos -> mechants / 100;
 	float curseurVirus = infos -> virus / 50;
 
 	char toWrite[50];
@@ -255,7 +255,7 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 	// mechants
 	else if (y > 37 + 57 * 7 && y < 57 + 57 * 7) {
 		if (x > 0 && x < 260) {
-			infos -> mechants = (x / 260.0) * 1000;
+			infos -> mechants = (x / 260.0) * 100;
 		}
 	}
 	// virus

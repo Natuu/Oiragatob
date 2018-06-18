@@ -27,7 +27,7 @@
 #define NOMBRESPLIT            3
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.5
-#define MECHANTS               500
+#define MECHANTS               50
 #define VIRUS                  16
 #define GENTILS                30
 #define RATIOSPLITMULTI        4
