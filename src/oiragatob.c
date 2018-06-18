@@ -207,42 +207,44 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 
 	// On gere l'offset sur x
 	x -= 20;
+	if (x < 0 && x > -11) x = 1;
+	if (x > 260 && x < 271) x = 260;
 
 	// On actualise la valeur de la position du curseur en % en fonction des parametres
 
 	// distanceCoeff
 	if (y > 37 && y < 57) {
-		if (x > 0 && x < 260) {
+		if (x >= 0 && x <= 260) {
 			infos -> distanceCoeff = (x / 260.0) * 2000;
 		}
 	}
 	// ratioSplitMulti
 	else if (y > 37 + 57 * 1 && y < 57 + 57 * 1) {
-		if (x > 0 && x < 260) {
+		if (x >= 0 && x <= 260) {
 			infos -> ratioSplitMulti = (x / 260.0) * 10;
 		}
 	}
 	// aureolage
 	else if (y > 37 + 57 * 2 && y < 57 + 57 * 2) {
-		if (x > 0 && x < 260) {
+		if (x >= 0 && x <= 260) {
 			infos -> aureolage = (x / 260.0) * 50;
 		}
 	}
 	// repulsionBords
 	else if (y > 37 + 57 * 3 && y < 57 + 57 * 3) {
-		if (x > 0 && x < 260) {
+		if (x >= 0 && x <= 260) {
 			infos -> repulsionBords = (x / 260.0) * 100;
 		}
 	}
 	// intensiteAureole
 	else if (y > 37 + 57 * 4 && y < 57 + 57 * 4) {
-		if (x > 0 && x < 260) {
+		if (x >= 0 && x <= 260) {
 			infos -> intensiteAureole = (x / 260.0) * 0.5;
 		}
 	}
 	// nombreSplit
 	else if (y > 37 + 57 * 5 && y < 57 + 57 * 5) {
-		if (x > 0 && x < 260) {
+		if (x >= 0 && x <= 260) {
 			infos -> nombreSplit = (x / 260.0) * 16;
 		}
 	}
@@ -418,6 +420,8 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
     }
 
 	// On affiche la cellule
+	int tailleAffichage = tailleInWindow(cellVivante.taille, infos, 1);
+	if (tailleAffichage < 1) tailleAffichage = 1;
 	filledCircleColor(renderer, *x, *y, tailleInWindow(cellVivante.taille, infos, 1), color);
 
 	free(x);
