@@ -152,7 +152,7 @@ int tailleInWindow(int taille, Infos *infos, int largeur) {
 		taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
 	}
 	else {
-		taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowHauteur;
+		taille = ((float)taille/(float)(infos -> visibleB - infos -> visibleH))  * *windowHauteur;
 	}
 
 	free(windowHauteur);

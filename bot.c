@@ -244,7 +244,7 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 int main(int argc, char **argv)
 {
 	// On initialise la fenetre de vision
-    if(0 != init(&window, &renderer, 640, 530)) goto Quit;
+    if(0 != init(&window, &renderer, 915, 530)) goto Quit;
 	SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
 	SDL_SetWindowTitle(window, "Vision du Lechbot");
 	SDL_RenderClear(renderer);
@@ -267,9 +267,9 @@ int main(int argc, char **argv)
 	int *y = malloc(sizeof(int));
 
 	SDL_GetWindowPosition(window, x, y);
-	SDL_SetWindowPosition(window, *x, *y);
-	SDL_SetWindowPosition(densiteWindow, *x - 505, *y);
-	SDL_SetWindowPosition(settings, *x + 645, *y);
+	SDL_SetWindowPosition(window, *x + 50, *y);
+	SDL_SetWindowPosition(densiteWindow, *x - 505 + 50, *y);
+	SDL_SetWindowPosition(settings, *x + 920 + 50, *y);
 
 	free(x);
 	free(y);
