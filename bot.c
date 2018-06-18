@@ -28,9 +28,9 @@
 #define INTENSITEAUREOLE       0.05
 #define INTENSITEAUREOLEBORDS  0.5
 #define MECHANTS               500
-#define VIRUS                  10
+#define VIRUS                  16
 #define GENTILS                30
-#define RATIOSPLITMULTI        2
+#define RATIOSPLITMULTI        4
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
 // call with: ./bot 127.0.0.1:1443      -s for solo

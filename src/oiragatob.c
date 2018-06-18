@@ -20,7 +20,7 @@ void afficherSettings(Infos *infos) {
 
 	// On set nos curseurs
 	float curseurDistance = infos -> distanceCoeff / 2000;
-	float curseurRatioSplitMulti = infos -> ratioSplitMulti / 3;
+	float curseurRatioSplitMulti = infos -> ratioSplitMulti / 10;
 	float curseurAureolage = infos -> aureolage / 50;
 	float curseurRepulsionBords = infos -> repulsionBords / 100;
 	float curseurIntensiteAureole = infos -> intensiteAureole / 0.5;
@@ -35,7 +35,7 @@ void afficherSettings(Infos *infos) {
 	sprintf(toWrite, "Distance : %d", (int)infos -> distanceCoeff);
 	creerCurseur(20, 37, curseurDistance, toWrite);
 
-	sprintf(toWrite, "Ratio Split : %d", (int)(infos -> ratioSplitMulti * 100));
+	sprintf(toWrite, "Ratio Split : %d", (int)(infos -> ratioSplitMulti * 10));
 	creerCurseur(20, 37 + 57 * 1, curseurRatioSplitMulti, toWrite);
 
 	sprintf(toWrite, "Auréolage : %d", (int)infos -> aureolage);
@@ -219,7 +219,7 @@ void getCurseurValeur(Infos *infos, int x, int y) {
 	// ratioSplitMulti
 	else if (y > 37 + 57 * 1 && y < 57 + 57 * 1) {
 		if (x > 0 && x < 260) {
-			infos -> ratioSplitMulti = (x / 260.0) * 3;
+			infos -> ratioSplitMulti = (x / 260.0) * 10;
 		}
 	}
 	// aureolage
