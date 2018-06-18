@@ -97,9 +97,6 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 	int tailleZoneX = *windowLargeur / nombreZonesVisiblesX;
 	int tailleZoneY = tailleZoneX;
 
-	free(windowHauteur);
-	free(windowLargeur);
-
 	if(tailleZoneX < 1) tailleZoneX = 1;
 	if(tailleZoneY < 1) tailleZoneY = 1;
 	if(tailleZoneX > 3) tailleZoneX = 3;
@@ -110,8 +107,8 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 	for (i = nombreZonesNonVisiblesH; i < idNombreZonesVisibleY; i++) {
 		for (j = nombreZonesNonVisiblesG; j < idNombreZonesVisibleX; j++) {
 
-			zone.x = tailleZoneX * (j - nombreZonesNonVisiblesG);
-			zone.y = tailleZoneY * (i - nombreZonesNonVisiblesH);
+			zone.x = tailleZoneX * (j - nombreZonesNonVisiblesG) + *windowLargeur / 2 - tailleZoneX * nombreZonesVisiblesX / 2;
+			zone.y = tailleZoneY * (i - nombreZonesNonVisiblesH) + *windowHauteur / 2 - tailleZoneY * nombreZonesVisiblesY / 2;
 
 			if (densite[i][j] > 0) {
 				SDL_SetRenderDrawColor(densiteRenderer, 230 - densite[i][j] *5000, 230, 230 - densite[i][j] *5000, 255);
@@ -122,6 +119,9 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 			SDL_RenderFillRect(densiteRenderer, &zone);
 		}
 	}
+
+	free(windowHauteur);
+	free(windowLargeur);
 
 	// On affiche la densité
 	SDL_RenderPresent(densiteRenderer);
