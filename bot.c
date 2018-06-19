@@ -16,21 +16,21 @@
 #include "headers/sdlFonctions.h"
 
 // Fine tuning
-#define DISTANCECOEFF          700
+#define DISTANCECOEFF          1425
 #define DENSITECOEFF           1
 #define RESOLUTION             0.4
-#define REPULSIONBORDS         8
+#define REPULSIONBORDS         5
 #define DISTANCEVISE           12
-#define AUREOLAGE              20
+#define AUREOLAGE              3
 #define TAILLECOEFF            1000
 #define TAILLESPLIT            75
-#define NOMBRESPLIT            3
-#define INTENSITEAUREOLE       0.05
+#define NOMBRESPLIT            0
+#define INTENSITEAUREOLE       0.26
 #define INTENSITEAUREOLEBORDS  0.5
-#define MECHANTS               50
-#define VIRUS                  16
-#define GENTILS                30
-#define RATIOSPLITMULTI        4
+#define MECHANTS               32
+#define VIRUS                  39
+#define GENTILS                44
+#define RATIOSPLITMULTI        8
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
 // call with: ./bot 127.0.0.1:1443      -s for solo
