@@ -90,11 +90,11 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 	if (idNombreZonesVisibleY > nombreZonesY) idNombreZonesVisibleY = nombreZonesY;
 
 	// Calcul de la taille relative des zones à l'affichage
-	int *windowHauteur = malloc(sizeof(int));
-	int *windowLargeur = malloc(sizeof(int));
-	SDL_GetWindowSize(densiteWindow, windowLargeur, windowHauteur);
+	int windowHauteur;
+	int windowLargeur;
+	SDL_GetWindowSize(densiteWindow, &windowLargeur, &windowHauteur);
 
-	int tailleZoneX = *windowLargeur / nombreZonesVisiblesX;
+	int tailleZoneX = windowLargeur / nombreZonesVisiblesX;
 	int tailleZoneY = tailleZoneX;
 
 	if(tailleZoneX < 1) tailleZoneX = 1;
@@ -107,8 +107,8 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 	for (i = nombreZonesNonVisiblesH; i < idNombreZonesVisibleY; i++) {
 		for (j = nombreZonesNonVisiblesG; j < idNombreZonesVisibleX; j++) {
 
-			zone.x = tailleZoneX * (j - nombreZonesNonVisiblesG) + *windowLargeur / 2 - tailleZoneX * nombreZonesVisiblesX / 2;
-			zone.y = tailleZoneY * (i - nombreZonesNonVisiblesH) + *windowHauteur / 2 - tailleZoneY * nombreZonesVisiblesY / 2;
+			zone.x = tailleZoneX * (j - nombreZonesNonVisiblesG) + windowLargeur / 2 - tailleZoneX * nombreZonesVisiblesX / 2;
+			zone.y = tailleZoneY * (i - nombreZonesNonVisiblesH) + windowHauteur / 2 - tailleZoneY * nombreZonesVisiblesY / 2;
 
 			if (densite[i][j] > 0) {
 				SDL_SetRenderDrawColor(densiteRenderer, 230 - densite[i][j] *5000, 230, 230 - densite[i][j] *5000, 255);
@@ -120,9 +120,6 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 		}
 	}
 
-	free(windowHauteur);
-	free(windowLargeur);
-
 	// On affiche la densité
 	SDL_RenderPresent(densiteRenderer);
 	SDL_SetRenderDrawColor(densiteRenderer, 60, 60, 60, 255);
@@ -132,31 +129,25 @@ void afficherDensite(Infos *infos, int nombreZonesX, int nombreZonesY, int **den
 // Donne la position dans la fenetre d'affichage
 void posInWindow(int *x, int *y, Infos *infos){
 
-	int *windowHauteur = malloc(sizeof(int));
-	int *windowLargeur = malloc(sizeof(int));
+	int windowHauteur;
+	int windowLargeur;
 
-	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
-	*x = ((float)(*x - infos -> visibleG)/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
-	*y = ((float)(*y - infos -> visibleH)/(float)(infos -> visibleB - infos -> visibleH))  * *windowHauteur;
-
-	free(windowHauteur);
-	free(windowLargeur);
+	SDL_GetWindowSize(window, &windowLargeur, &windowHauteur);
+	*x = ((float)(*x - infos -> visibleG)/(float)(infos -> visibleD - infos -> visibleG))  * windowLargeur;
+	*y = ((float)(*y - infos -> visibleH)/(float)(infos -> visibleB - infos -> visibleH))  * windowHauteur;
 }
 
 // Donne la taille dans la fenetre d'affichage
 int tailleInWindow(int taille, Infos *infos, int largeur) {
-	int *windowHauteur = malloc(sizeof(int));
-	int *windowLargeur = malloc(sizeof(int));
-	SDL_GetWindowSize(window, windowLargeur, windowHauteur);
+	int windowHauteur;
+	int windowLargeur;
+	SDL_GetWindowSize(window, &windowLargeur, &windowHauteur);
 	if (largeur) {
-		taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * *windowLargeur;
+		taille = ((float)taille/(float)(infos -> visibleD - infos -> visibleG))  * windowLargeur;
 	}
 	else {
-		taille = ((float)taille/(float)(infos -> visibleB - infos -> visibleH))  * *windowHauteur;
+		taille = ((float)taille/(float)(infos -> visibleB - infos -> visibleH))  * windowHauteur;
 	}
-
-	free(windowHauteur);
-	free(windowLargeur);
 
 	return taille;
 }
@@ -353,11 +344,9 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
 	float attrait = 0;
 	int k;
 	int l;
-	int *x = malloc(sizeof(int));
-	int *y = malloc(sizeof(int));
-	*x = cellVivante.x;
-	*y = cellVivante.y;
-	posInWindow(x, y, infos);
+	int x = cellVivante.x;
+	int y = cellVivante.y;
+	posInWindow(&x, &y, infos);
 	int color = 0;
 
 	// Indice de la case centrale du remplissage
@@ -424,10 +413,7 @@ void hydrater(Cellule cellVivante, Infos *infos, int **densite, int nombreZonesX
 	int tailleAffichageY = tailleInWindow(cellVivante.taille, infos, 0);
 	if (tailleAffichageX < 1) tailleAffichageX = 1;
 	if (tailleAffichageY < 1) tailleAffichageY = 1;
-	filledEllipseColor(renderer, *x, *y, tailleAffichageX, tailleAffichageY, color);
-
-	free(x);
-	free(y);
+	filledEllipseColor(renderer, x, y, tailleAffichageX, tailleAffichageY, color);
 
 	// Pour chaque zones qu'occupe la cellule
 	for (i = -nbCases; i <= nbCases; i++) {
@@ -782,7 +768,7 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
 		int possedeCellule = 0;
 
 		for (j = 0; j < 30; j++) {
-				if (infos -> cellule[j].id != 0) possedeCellule = 1;
+				if (infos -> cellules[j].id != 0) possedeCellule = 1;
 		}
 
 		// Si on en a plus, on affiche un message et on met la taille à 0
