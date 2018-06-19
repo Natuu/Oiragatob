@@ -778,6 +778,19 @@ void oiragatob (unsigned char *recu, Buffer *envoi, Infos *infos, int *forceExit
             }
         }
 
+				// On vérifie qu'on possède une cellule
+				int possedeCellule = 0;
+
+				for (j = 0; j < 30; j++) {
+						if (infos -> cellules[j].id != 0) possedeCellule = 1;
+				}
+
+				// Si on en a plus, on affiche un message et on met la taille à 0
+				if (!possedeCellule) {
+					infos -> taille = 0;
+					printf("Et c'est une fin de tournage pour le LechBot !\n");
+				}
+
         // Tri du buffer
         int parcourCell = 3 + cellMort * 8;
 

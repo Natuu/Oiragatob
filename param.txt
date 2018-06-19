@@ -1,74 +1,57 @@
-Score 138 
+Score 121
 
-Distance = 1474.000000 
-ratioSplitMulti = 5.000000 
-aureolage = 38.000000 
-repulsionBords = 12.000000 
-intensiteAureole = 0.190000 
-nombreSplit = 3.000000 
-gentils = 26.000000 
-mechants = 50.000000 
-virus = 14.000000 
-
-
- --------- 
-
-Score 142 
-
-Distance = 562.000000 
-ratioSplitMulti = 7.000000 
-aureolage = 21.000000 
-repulsionBords = 89.000000 
-intensiteAureole = 0.030000 
-nombreSplit = 11.000000 
-gentils = 11.000000 
-mechants = 20.000000 
-virus = 41.000000 
+Distance = 324.000000
+ratioSplitMulti = 3.000000
+aureolage = 14.000000
+repulsionBords = 29.000000
+intensiteAureole = 0.410000
+nombreSplit = 14.000000
+gentils = 13.000000
+mechants = 19.000000
+virus = 20.000000
 
 
- --------- 
+ ---------
 
-Score 170 
+Score 117
 
-Distance = 828.000000 
-ratioSplitMulti = 2.000000 
-aureolage = 2.000000 
-repulsionBords = 77.000000 
-intensiteAureole = 0.020000 
-nombreSplit = 1.000000 
-gentils = 30.000000 
-mechants = 33.000000 
-virus = 24.000000 
+Distance = 176.000000
+ratioSplitMulti = 2.000000
+aureolage = 28.000000
+repulsionBords = 23.000000
+intensiteAureole = 0.100000
+nombreSplit = 2.000000
+gentils = 49.000000
+mechants = 16.000000
+virus = 47.000000
 
 
- --------- 
+ ---------
+Score 155
 
-Score 138 
+Distance = 341.000000
+ratioSplitMulti = 2.000000
+aureolage = 33.000000
+repulsionBords = 0.000000
+intensiteAureole = 0.030000
+nombreSplit = 12.000000
+gentils = 13.000000
+mechants = 9.000000
+virus = 15.000000
 
-Distance = 1469.000000 
-ratioSplitMulti = 5.000000 
-aureolage = 7.000000 
-repulsionBords = 29.000000 
-intensiteAureole = 0.110000 
+
+ ---------
+Score 185 
+
+Distance = 1386.000000 
+ratioSplitMulti = 6.000000 
+aureolage = 47.000000 
+repulsionBords = 63.000000 
+intensiteAureole = 0.010000 
 nombreSplit = 0.000000 
-gentils = 17.000000 
-mechants = 34.000000 
-virus = 11.000000 
-
-
- --------- 
-
-Score 151 
-
-Distance = 1743.000000 
-ratioSplitMulti = 4.000000 
-aureolage = 22.000000 
-repulsionBords = 35.000000 
-intensiteAureole = 0.050000 
-nombreSplit = 4.000000 
-gentils = 33.000000 
-mechants = 17.000000 
-virus = 44.000000 
+gentils = 6.000000 
+mechants = 25.000000 
+virus = 9.000000 
 
 
  --------- 

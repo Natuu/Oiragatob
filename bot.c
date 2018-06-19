@@ -16,21 +16,21 @@
 #include "headers/sdlFonctions.h"
 
 // Fine tuning
-#define DISTANCECOEFF          700
+#define DISTANCECOEFF          1550
 #define DENSITECOEFF           1
 #define RESOLUTION             0.4
-#define REPULSIONBORDS         8
+#define REPULSIONBORDS         14
 #define DISTANCEVISE           12
-#define AUREOLAGE              20
+#define AUREOLAGE              15
 #define TAILLECOEFF            1000
 #define TAILLESPLIT            75
 #define NOMBRESPLIT            3
-#define INTENSITEAUREOLE       0.05
+#define INTENSITEAUREOLE       0.36
 #define INTENSITEAUREOLEBORDS  0.5
-#define MECHANTS               50
-#define VIRUS                  16
-#define GENTILS                30
-#define RATIOSPLITMULTI        4
+#define MECHANTS               72
+#define VIRUS                  21
+#define GENTILS                10
+#define RATIOSPLITMULTI        2
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
 // call with: ./bot 127.0.0.1:1443      -s for solo
@@ -243,9 +243,11 @@ int callbackOgar(struct lws *wsi, enum lws_callback_reasons reason, void *user, 
 /****************************************************************************************************************************/
 int main(int argc, char **argv)
 {
+	int j;
+
 	FILE* fichier = NULL;
 
-    fichier = fopen("param.txt", "a");
+  fichier = fopen("param.md", "a");
 
 	srandom(time(NULL));
 
@@ -256,7 +258,6 @@ int main(int argc, char **argv)
 	int aureolage = rand() % 50;
 	int repulsionBords = rand() % 100;
 	float intensiteAureole = (float)(rand() % 50)/100;
-	int nombreSplit = rand() % 16;
 	int gentils = rand() % 50;
 	int mechants = rand() % 100;
 	int virus = rand() % 50;
@@ -370,7 +371,7 @@ int main(int argc, char **argv)
 	while (!forceExit) {
 		secondesEcoules = time(NULL) - secondesDepart;
 		//printf("%d\n",secondesEcoules);
-		if (secondesEcoules < 60){
+		if (secondesEcoules < 120){
 			lws_service(context, 1000);
 			infos.distanceCoeff = distanceCoeff;
 			//printf("%d\n",infos.taille);
@@ -378,25 +379,32 @@ int main(int argc, char **argv)
 			infos.aureolage = aureolage;
 			infos.repulsionBords = repulsionBords;
 			infos.intensiteAureole = intensiteAureole;
-			infos.nombreSplit = nombreSplit;
 			infos.gentils = gentils;
 			infos.mechants = mechants;
 			infos.virus = virus;
 
 		}
 		else {
-			if (infos.taille > 100){
-				fprintf(fichier,"Score %d \n\n", infos.taille);
-				fprintf(fichier,"Distance = %lf \n", infos.distanceCoeff);
-				fprintf(fichier,"ratioSplitMulti = %lf \n", infos.ratioSplitMulti);
-				fprintf(fichier,"aureolage = %lf \n", infos.aureolage);
-				fprintf(fichier,"repulsionBords = %lf \n", infos.repulsionBords);
-				fprintf(fichier,"intensiteAureole = %lf \n", infos.intensiteAureole);
-				fprintf(fichier,"nombreSplit = %lf \n", infos.nombreSplit);
-				fprintf(fichier,"gentils = %lf \n", infos.gentils);
-				fprintf(fichier,"mechants = %lf \n", infos.mechants);
-				fprintf(fichier,"virus = %lf \n", infos.virus);
-				fprintf(fichier, "\n\n --------- \n\n");
+
+			int tailleTotale = 0;
+			for (j = 0; j < 30; j++) {
+				tailleTotale += infos.cellules[j].taille;
+			}
+
+			if (tailleTotale > 100){
+				fprintf(fichier,"# Score *%d* \n\n", infos.taille);
+				fprintf(fichier,"|**Paramètre**|**Valeur**|\n");
+				fprintf(fichier,"|-------------|----------|\n");
+				fprintf(fichier,"| Distance    | %lf      |\n", infos.distanceCoeff);
+				fprintf(fichier,"| ratioSplitMulti | %lf  |\n", infos.ratioSplitMulti);
+				fprintf(fichier,"| aureolage   | %lf      |\n", infos.aureolage);
+				fprintf(fichier,"| repulsionBords | %lf   |\n", infos.repulsionBords);
+				fprintf(fichier,"| intensiteAureole | %lf |\n", infos.intensiteAureole);
+				fprintf(fichier,"| nombreSplit | %lf      |\n", infos.nombreSplit);
+				fprintf(fichier,"| gentils     | %lf      |\n", infos.gentils);
+				fprintf(fichier,"| mechants    | %lf      |\n", infos.mechants);
+				fprintf(fichier,"| virus       | %lf      |\n", infos.virus);
+				fprintf(fichier, "\n\n-------------\n\n");
 			}
 			fclose(fichier);
 			forceExit = 1;
