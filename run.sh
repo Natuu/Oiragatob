@@ -2,5 +2,5 @@
 
 while [ 1 ]
 do
-	/home/userir/github/Oiragatob/bot 192.168.130.130:2001
+	/home/userir/github/Oiragatob/bot 127.0.0.1:1443
 done
