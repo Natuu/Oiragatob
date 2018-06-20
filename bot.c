@@ -30,6 +30,11 @@
 #define MECHANTS               50
 #define VIRUS                  20
 #define GENTILS                30
+#define INTENSITEAUREOLE       0.005
+#define INTENSITEAUREOLEBORDS  0.5
+#define MECHANTS               50
+#define GENTILS                20
+#define VIRUS									 30
 #define RATIOSPLITMULTI        0.05
 
 // compile with gcc -Wall -g -o bot ./bot.c ./src/oiragatob.c -lwebsockets -lm
